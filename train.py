@@ -21,14 +21,14 @@ dir_checkpoint = Path('./checkpoints/')
 def train_net(net,
               device,
               epochs: int = 5,
-              batch_size: int = 16,
+              batch_size: int = 32,
               learning_rate: float = 1e-5,
               val_percent: float = 0.1,
               save_checkpoint: bool = True,
               img_scale: float = 0.5,
               amp: bool = False):
     # 1. Create dataset
-    dataset = BBKDataset(zone = ("genf", "goesch",), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
 
     # 2. Split into train / validation partitions
     n_val = int(len(dataset) * val_percent)
