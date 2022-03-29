@@ -17,6 +17,7 @@ device = 'cuda'
 
 epochs= 10
 
+#TODO: try 64
 batch_size= 32
 #batch_size = [16, 32, 64, 128]
 
@@ -30,7 +31,8 @@ amp = False
 bilinear = False
 
 # Choose optimizer
-optim_class_list  = [optim.RMSprop, optim.Adam, optim.SGD]
+#optim_class_list  = [optim.RMSprop, optim.Adam, optim.SGD]
+optim_class_list  = [optim.Adam, optim.SGD]
 #optimizer = [Adam(weight_decay), SDGD(momentum), RMSprop]
 
 #Defining the loading of pre_trained model  (if defined, it is the path for the *.pth file)

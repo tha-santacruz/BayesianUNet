@@ -39,7 +39,7 @@ def train_net(net,
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
 
     experiment.config.update(dict(epochs=epochs, optim_class=optim_class, batch_size=batch_size, learning_rate=learning_rate,
-                                  save_checkpoint=save_checkpoint, amp=amp))
+                                  save_checkpoint=save_checkpoint, amp=amp, allow_val_change=True))
     n_val = len(val_set)
     n_train = len(train_set)
 
@@ -56,7 +56,11 @@ def train_net(net,
     ''')
 
     # 4. Set up the optimizer, the loss, the learning rate scheduler and the loss scaling for AMP
-    optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8, momentum=0.9)
+    try:
+        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8,momentum=0.9)
+    except:
+        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8)
+        
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=2)  # goal: maximize Dice score
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
     criterion = nn.CrossEntropyLoss()
