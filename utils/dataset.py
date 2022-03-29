@@ -14,8 +14,10 @@ class BBKDataset:
         # Constants
         self.ROOT = "./../data/"
         self.SPLIT_SIZE = {"train": 0.7, "test": 0.2, "val": 0.1}
-        self.BBK_CLASSES = ["null","wooded_area", "water", "bushes", "individual_tree", "no_woodland", "ruderal_area", 
-        "without_vegetation", "buildings"]
+        # self.BBK_CLASSES_list = ["null","wooded_area", "water", "bushes", "individual_tree", "no_woodland", "ruderal_area", 
+        # "without_vegetation", "buildings"]
+        self.BBK_CLASSES_dict = {0 : "null", 1 : "wooded_area", 2 : "water", 3 : "bushes", 4 : "individual_tree", 
+                                 5 : "no_woodland", 6 : "ruderal_area", 7 : "without_vegetation", 8 : "buildings"}
 
         # Handle data coverage zone
         self.zone = []
