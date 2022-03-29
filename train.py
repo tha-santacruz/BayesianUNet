@@ -130,6 +130,11 @@ def train_net(net,
                             },
                             'step': global_step,
                             'epoch': epoch,
+                            'conf_mat' : wandb.plot.confusion_matrix(probs=None,
+                                                                     y_true = torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy().flatten(),
+                                                                     preds = torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy().flatten(),
+                                                                     class_names = ["null","wooded_area", "water", "bushes", "individual_tree", "no_woodland", "ruderal_area","without_vegetation", "buildings"] 
+                                                                    ),
                             **histograms
                         })
 
