@@ -37,12 +37,15 @@ def train_net(net,
 
     # (Initialize logging)
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
-    experiment.config.update(dict(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate,
+
+    experiment.config.update(dict(epochs=epochs, optim_class=optim_class, batch_size=batch_size, learning_rate=learning_rate,
                                   save_checkpoint=save_checkpoint, amp=amp))
     n_val = len(val_set)
     n_train = len(train_set)
+
     logging.info(f'''Starting training:
         Epochs:          {epochs}
+        Optimizer:       {optim_class}
         Batch size:      {batch_size}
         Learning rate:   {learning_rate}
         Training size:   {n_train}
