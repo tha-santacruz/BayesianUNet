@@ -30,7 +30,8 @@ def train_net(net,
               amp: bool = False,
               run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
 
-    
+    # 1. Create dataset
+    dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
 
     # 2. Split into train / validation partitions
     n_val = int(len(dataset) * val_percent)
@@ -184,8 +185,7 @@ if __name__ == '__main__':
         net.load_state_dict(torch.load(args.load, map_location=device))
         logging.info(f'Model loaded from {args.load}')
 
-    # 1. Create dataset
-    dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    
 
     net.to(device=device)
     try:

@@ -4,8 +4,10 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-from train import train_net
+import torch 
 
+from unet import UNet
+from train import train_net
 
 ##Hyperparameters
 
@@ -25,10 +27,11 @@ img_scale= 0.5
 
 amp = False
 
+bilinear = False
 
 #TODO : add optmizer in the wandb.config
 #TODO : pass optimizer as parameter in train.py
-optimizer = [Adam(weight_decay), SDGD(momentum), RMSprop]
+#optimizer = [Adam(weight_decay), SDGD(momentum), RMSprop]
 
 #TODO : to iterate to 
 #momentum = 
@@ -42,7 +45,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logging.info(f'Using device {device}')
 
 # Change here to adapt to your data
-net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
+net = UNet(n_channels=7, n_classes=9, bilinear=bilinear)
 
 logging.info(f'Network:\n'
             f'\t{net.n_channels} input channels\n'
@@ -54,7 +57,7 @@ if load:
     logging.info(f'Model loaded from {load}')
 
 # 1. Create dataset
-dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
+#dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
 
 net.to(device=device)
 try:
@@ -63,7 +66,7 @@ try:
                 batch_size=batch_size,
                 learning_rate=learning_rate,
                 device=device,
-                val_percent=val / 100,
+                val_percent= val_percent/100,
                 amp=amp)
 except KeyboardInterrupt:
     torch.save(net.state_dict(), 'INTERRUPTED.pth')
