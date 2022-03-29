@@ -1,7 +1,6 @@
 from train import train_net
 
 
-
 #Hyperparameters
 
 epochs= 5,
