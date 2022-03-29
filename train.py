@@ -27,8 +27,8 @@ def train_net(net,
               save_checkpoint: bool = True,
               img_scale: float = 0.5,
               amp: bool = False):
-    # 1. Create dataset
-    dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
+
+    
 
     # 2. Split into train / validation partitions
     n_val = int(len(dataset) * val_percent)
@@ -118,12 +118,13 @@ def train_net(net,
 
                         val_score = evaluate(net, val_loader, device)
                         scheduler.step(val_score)
-
+                        class_labels = {0 : "null", 1 : "wooded_area", 2 : "water", 3 : "bushes", 4 : "individual_tree", 5 : "no_woodland", 6 : "ruderal_area", 7 : "without_vegetation", 8 : "buildings"}
                         logging.info('Validation Dice score: {}'.format(val_score))
                         experiment.log({
                             'learning rate': optimizer.param_groups[0]['lr'],
                             'validation Dice': val_score,
-                            'images': wandb.Image(images[0][:3].cpu()),
+                            'images': wandb.Image(images[0][:3].cpu()
+                                                    ),
                             'masks': {
                                 'true': wandb.Image(torch.softmax(true_masks, dim=1).argmax(dim=1)[0].float().cpu()),
                                 'pred': wandb.Image(torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].float().cpu()),
@@ -180,6 +181,9 @@ if __name__ == '__main__':
     if args.load:
         net.load_state_dict(torch.load(args.load, map_location=device))
         logging.info(f'Model loaded from {args.load}')
+
+    # 1. Create dataset
+    dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
 
     net.to(device=device)
     try:

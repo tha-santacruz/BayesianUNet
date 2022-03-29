@@ -147,7 +147,7 @@ class BBKDataset:
                 non_null = image.detach().clone()
                 non_null[non_null>0] = 1
                 # To one hot encoding
-                image = F.one_hot(image[0,:,:].to(torch.int64), num_classes = len(self.BBK_CLASSES))
+                image = F.one_hot(image[0,:,:].to(torch.int64), num_classes = len(self.BBK_CLASSES_dict))
                 image = image.permute(2,0,1)
                 label = image.to(torch.float32)
             # Create document channel
