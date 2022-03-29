@@ -72,7 +72,8 @@ if __name__ == '__main__':
                             batch_size=batch_size,
                             learning_rate=learning_rate,
                             device=device,
-                            amp=amp)
+                            amp=amp,
+                            run_name = str(optim_class))
 
             except KeyboardInterrupt:
                 torch.save(net.state_dict(), 'INTERRUPTED.pth')
