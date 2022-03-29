@@ -7,19 +7,24 @@ from datetime import datetime
 from train import train_net
 
 
-#Hyperparameters
+##Hyperparameters
 
-epochs= 5,
-batch_size= 32,
+epochs= 5
+
+batch_size= 32
 #batch_size = [16, 32, 64, 128]
 
-learning_rate= 1e-5,
+learning_rate= 1e-5
 #learning_rate = [1e-4, 1e-5, 1e-6, 1e-7]
 
-val_percent= 0.1,
-save_checkpoint = True,
-img_scale= 0.5,
+val_percent= 0.1
+
+save_checkpoint = True
+
+img_scale= 0.5
+
 amp = False
+
 
 #TODO : add optmizer in the wandb.config
 #TODO : pass optimizer as parameter in train.py
@@ -37,14 +42,12 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logging.info(f'Using device {device}')
 
 # Change here to adapt to your data
-# n_channels=3 for RGB images
-# n_classes is the number of probabilities you want to get per pixel
 net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
 
 logging.info(f'Network:\n'
-                f'\t{net.n_channels} input channels\n'
-                f'\t{net.n_classes} output channels (classes)\n'
-                f'\t{"Bilinear" if net.bilinear else "Transposed conv"} upscaling')
+            f'\t{net.n_channels} input channels\n'
+            f'\t{net.n_classes} output channels (classes)\n'
+            f'\t{"Bilinear" if net.bilinear else "Transposed conv"} upscaling')
 
 if load:
     net.load_state_dict(torch.load(load, map_location=device))
