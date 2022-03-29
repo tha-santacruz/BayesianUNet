@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+from datetime import datetime
 
 import torch
 import torch.nn as nn
@@ -26,9 +27,10 @@ def train_net(net,
               val_percent: float = 0.1,
               save_checkpoint: bool = True,
               img_scale: float = 0.5,
-              amp: bool = False):
-    # 1. Create dataset
-    dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
+              amp: bool = False,
+              run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
+
+    
 
     # 2. Split into train / validation partitions
     n_val = int(len(dataset) * val_percent)
@@ -43,7 +45,7 @@ def train_net(net,
     val_loader = DataLoader(val_set, shuffle=False, drop_last=True, batch_size=batch_size)
 
     # (Initialize logging)
-    experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow')
+    experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
     experiment.config.update(dict(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate,
                                   val_percent=val_percent, save_checkpoint=save_checkpoint, img_scale=img_scale,
                                   amp=amp))
@@ -118,18 +120,24 @@ def train_net(net,
 
                         val_score = evaluate(net, val_loader, device)
                         scheduler.step(val_score)
-
+                        class_labels = {0 : "null", 1 : "wooded_area", 2 : "water", 3 : "bushes", 4 : "individual_tree", 5 : "no_woodland", 6 : "ruderal_area", 7 : "without_vegetation", 8 : "buildings"}
                         logging.info('Validation Dice score: {}'.format(val_score))
                         experiment.log({
                             'learning rate': optimizer.param_groups[0]['lr'],
                             'validation Dice': val_score,
-                            'images': wandb.Image(images[0][:3].cpu()),
+                            'images': wandb.Image(images[0][:3].cpu()
+                                                    ),
                             'masks': {
                                 'true': wandb.Image(torch.softmax(true_masks, dim=1).argmax(dim=1)[0].float().cpu()),
                                 'pred': wandb.Image(torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].float().cpu()),
                             },
                             'step': global_step,
                             'epoch': epoch,
+                            'conf_mat' : wandb.plot.confusion_matrix(probs=None,
+                                                                     y_true = torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy().flatten(),
+                                                                     preds = torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy().flatten(),
+                                                                     class_names = ["null","wooded_area", "water", "bushes", "individual_tree", "no_woodland", "ruderal_area","without_vegetation", "buildings"] 
+                                                                    ),
                             **histograms
                         })
 
@@ -175,6 +183,9 @@ if __name__ == '__main__':
     if args.load:
         net.load_state_dict(torch.load(args.load, map_location=device))
         logging.info(f'Model loaded from {args.load}')
+
+    # 1. Create dataset
+    dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
 
     net.to(device=device)
     try:
