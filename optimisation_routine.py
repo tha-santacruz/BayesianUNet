@@ -11,7 +11,7 @@ from train import train_net
 
 ##Hyperparameters
 
-epochs= 5
+epochs= 2
 
 batch_size= 32
 #batch_size = [16, 32, 64, 128]

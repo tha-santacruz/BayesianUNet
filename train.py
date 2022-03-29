@@ -31,7 +31,7 @@ def train_net(net,
               run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
 
     # 1. Create dataset
-    dataset = BBKDataset(zone = ("genf", "goesch","jura"), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    dataset = BBKDataset(zone = ("genf",), split = "train", buildings = True, vegetation = True, random_seed = 1)
 
     # 2. Split into train / validation partitions
     n_val = int(len(dataset) * val_percent)
@@ -69,6 +69,12 @@ def train_net(net,
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
     criterion = nn.CrossEntropyLoss()
     global_step = 0
+
+    # util function for generating interactive image mask from components
+    def wb_mask(bg_img, pred_mask, true_mask, labels):
+        return wandb.Image(bg_img, masks={
+            "prediction" : {"mask_data" : pred_mask, "class_labels" : labels},
+            "ground truth" : {"mask_data" : true_mask, "class_labels" : labels}})
 
     # 5. Begin training
     for epoch in range(epochs):
@@ -121,8 +127,18 @@ def train_net(net,
 
                         val_score = evaluate(net, val_loader, device)
                         scheduler.step(val_score)
-                        class_labels = {0 : "null", 1 : "wooded_area", 2 : "water", 3 : "bushes", 4 : "individual_tree", 5 : "no_woodland", 6 : "ruderal_area", 7 : "without_vegetation", 8 : "buildings"}
                         logging.info('Validation Dice score: {}'.format(val_score))
+
+                        class_labels = {0 : "null",
+                                        1 : "wooded_area",
+                                        2 : "water",
+                                        3 : "bushes",
+                                        4 : "individual_tree",
+                                        5 : "no_woodland",
+                                        6 : "ruderal_area",
+                                        7 : "without_vegetation", 
+                                        8 : "buildings"}
+
                         experiment.log({
                             'learning rate': optimizer.param_groups[0]['lr'],
                             'validation Dice': val_score,
@@ -139,6 +155,11 @@ def train_net(net,
                                                                      preds = torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy().flatten(),
                                                                      class_names = ["null","wooded_area", "water", "bushes", "individual_tree", "no_woodland", "ruderal_area","without_vegetation", "buildings"] 
                                                                     ),
+                            'predictions': wb_mask(images[0][:3].cpu(),
+                                                   torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy(),
+                                                   torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy(),
+                                                   class_labels
+                                                   ),
                             **histograms
                         })
 
