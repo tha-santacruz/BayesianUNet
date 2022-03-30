@@ -15,7 +15,7 @@ zone = ("all",)
 device = 'cuda'
 ##Hyperparameters
 
-epochs= 10
+epochs= 4
 
 #TODO: try 64
 batch_size= 32
@@ -32,7 +32,7 @@ bilinear = False
 
 # Choose optimizer
 #optim_class_list  = [optim.RMSprop, optim.Adam, optim.SGD]
-optim_class_list  = [optim.Adam, optim.SGD]
+optim_class_list  = [optim.SGD]
 #optimizer = [Adam(weight_decay), SDGD(momentum), RMSprop]
 
 #Defining the loading of pre_trained model  (if defined, it is the path for the *.pth file)
