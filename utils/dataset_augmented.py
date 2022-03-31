@@ -154,7 +154,7 @@ class BBKDataset:
                 label = image.to(torch.float32)
             # Create document channel
             else:
-                # Standardize using mean and std valiues
+                # Standardize using mean and std values
                 if self.folders[f] == "tile_50m/":
                     image = (image-self.mean_vals_tiles).div(self.std_vals_tiles)
                 elif self.folders[f] == "hoe_50m/":
@@ -165,8 +165,8 @@ class BBKDataset:
                     image = non_null*image
                 doc = torch.cat((doc, image), dim=0)
                 doc = doc.to(torch.float32)
-        transformed = self.rnd_flips(image=doc, mask=label)
-        return transformed["image"], transformed["mask"]
+        transformed = self.rnd_flips(image=doc.numpy(), mask=label.numpy())
+        return torch.from_numpy(transformed["image"]).to(torch.float32),torch.from_numpy(transformed["mask"]).to(torch.float32)
 
     def reportissues(self):
         """Provides information about discarded data sources"""
