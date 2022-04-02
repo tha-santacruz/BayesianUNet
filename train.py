@@ -34,7 +34,7 @@ def train_net(net,
 
     # Create data loaders
     train_loader = DataLoader(train_set, shuffle=True, batch_size=batch_size)
-    val_loader = DataLoader(val_set, shuffle=False, drop_last=True, batch_size=batch_size)
+    val_loader = DataLoader(val_set, shuffle=False, batch_size=batch_size)
 
     # Initialize logging
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
