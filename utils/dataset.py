@@ -168,10 +168,9 @@ class BBKDataset:
                     image = non_null*image
                 doc = torch.cat((doc, image), dim=0)
                 doc = doc.to(torch.float32)
-        if self.augment:
-            if self.split == "train":
-                transformed = self.rnd_flips(image=doc.numpy(), mask=label.numpy())
-                return torch.from_numpy(transformed["image"]).to(torch.float32),torch.from_numpy(transformed["mask"]).to(torch.float32)
+        if self.augment & (self.split == "train"):
+            transformed = self.rnd_flips(image=doc.numpy(), mask=label.numpy())
+            return torch.from_numpy(transformed["image"]).to(torch.float32),torch.from_numpy(transformed["mask"]).to(torch.float32)
         else:
             return doc, label
 
