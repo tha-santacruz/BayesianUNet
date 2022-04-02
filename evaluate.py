@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from tqdm import tqdm
 
 from utils.dice_score import multiclass_dice_coeff, dice_coeff
-
+from utils.accuracy import accuracy_coeff
 
 def evaluate(net, dataloader, device):
     net.eval()
@@ -27,12 +27,17 @@ def evaluate(net, dataloader, device):
                 # compute the Dice score
                 dice_score += dice_coeff(mask_pred, mask_true, reduce_batch_first=False)
             else:
+                
+
                 mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0, 3, 1, 2).float()
+                
+                 #compute the accuracy
+                accuracy_score += accuracy_coeff(mask_pred.int()[:, 1:, ...], mask_true[:, 1:, ...])
                 # compute the Dice score, ignoring background
+                #TODO : do we really have to ignore the first class ?
                 dice_score += multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
                 
-                #compute the accuracy
-                #accuracy_score += accuracy_score(mask_pred[:, 1:, ...], mask_true[:, 1:, ...])
+               
            
 
     net.train()
@@ -40,5 +45,4 @@ def evaluate(net, dataloader, device):
     # Fixes a potential division by zero error
     if num_val_batches == 0:
         return dice_score
-    return dice_score / num_val_batches 
-            #, accuracy_score
+    return dice_score / num_val_batches, accuracy_score
