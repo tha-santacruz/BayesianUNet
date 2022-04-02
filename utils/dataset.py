@@ -7,9 +7,11 @@ from torch import nn
 from torch.nn import functional as F
 from tqdm import tqdm
 import random
+import albumentations as A
 
 class BBKDataset:
-    def __init__(self, zone: tuple = ("all",), split: str = "train", buildings: bool = True, vegetation: bool = True, random_seed = 1):
+    def __init__(self, zone: tuple = ("all",), split: str = "train", random_seed = 1,
+                 buildings: bool = True, vegetation: bool = True, augment: bool = True):
         """Initialization method"""
         # Constants
         self.ROOT = "./../data/"
@@ -18,6 +20,10 @@ class BBKDataset:
                                  "no_woodland", "ruderal_area", "without_vegetation", "buildings"]
         self.BBK_CLASSES_dict = {0 : "null", 1 : "wooded_area", 2 : "water", 3 : "bushes", 4 : "individual_tree", 
                                  5 : "no_woodland", 6 : "ruderal_area", 7 : "without_vegetation", 8 : "buildings"}
+        
+        # Augmentation methods
+        self.rnd_flips = A.Compose([A.HorizontalFlip(p=0.5),A.VerticalFlip(p=0.5)])
+
         # Handle data coverage zone
         self.zone = []
         if isinstance(zone, tuple):
@@ -105,7 +111,6 @@ class BBKDataset:
             self.mean_vals_vegetation = self.mean_vals_vegetation.mean()
             self.std_vals_vegetation = self.std_vals_vegetation.mean()
         
-        
         # Define how much samples will be available 
         self.split_counts = [int(len(self.coordinates)*self.SPLIT_SIZE["train"])]
         self.split_counts.append(int(len(self.coordinates)*self.SPLIT_SIZE["test"]))
@@ -119,8 +124,9 @@ class BBKDataset:
             self.split_coordinates = self.coordinates[self.split_counts[0]+self.split_counts[1]:]
         else:
             raise ValueError("Invalid split : values can be 'train', 'test' or 'val'")
+        self.split = split
+        self.augment = augment
         
-
     def __len__(self):
         """returns length of valid tiles set"""
         return len(self.split_coordinates)
@@ -146,13 +152,12 @@ class BBKDataset:
                 non_null = image.detach().clone()
                 non_null[non_null>0] = 1
                 # To one hot encoding
-
                 image = F.one_hot(image[0,:,:].to(torch.int64), num_classes = len(self.BBK_CLASSES_list))
                 image = image.permute(2,0,1)
                 label = image.to(torch.float32)
             # Create document channel
             else:
-                # Standardize using mean and std valiues
+                # Standardize using mean and std values
                 if self.folders[f] == "tile_50m/":
                     image = (image-self.mean_vals_tiles).div(self.std_vals_tiles)
                 elif self.folders[f] == "hoe_50m/":
@@ -163,7 +168,12 @@ class BBKDataset:
                     image = non_null*image
                 doc = torch.cat((doc, image), dim=0)
                 doc = doc.to(torch.float32)
-        return doc, label
+        if self.augment:
+            if self.split == "train":
+                transformed = self.rnd_flips(image=doc.numpy(), mask=label.numpy())
+                return torch.from_numpy(transformed["image"]).to(torch.float32),torch.from_numpy(transformed["mask"]).to(torch.float32)
+        else:
+            return doc, label
 
     def reportissues(self):
         """Provides information about discarded data sources"""

@@ -27,6 +27,7 @@ def train_net(net,
               epochs: int = 5,
               batch_size: int = 32,
               learning_rate: float = 1e-5,
+              patience: int = 2,
               save_checkpoint: bool = True,
               amp: bool = False,
               run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
@@ -35,7 +36,7 @@ def train_net(net,
     train_loader = DataLoader(train_set, shuffle=True, batch_size=batch_size)
     val_loader = DataLoader(val_set, shuffle=False, drop_last=True, batch_size=batch_size)
 
-    # (Initialize logging)
+    # Initialize logging
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
 
     experiment.config.update(dict(epochs=epochs, optim_class=optim_class, batch_size=batch_size, learning_rate=learning_rate,
@@ -55,13 +56,13 @@ def train_net(net,
         Mixed Precision: {amp}
     ''')
 
-    # 4. Set up the optimizer, the loss, the learning rate scheduler and the loss scaling for AMP
+    # Set up the optimizer, the loss, the learning rate scheduler and the loss scaling for AMP
     try:
-        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8,momentum=0.9)
+        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8, momentum=0.9)
     except:
         optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8)
         
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=2)  # goal: maximize Dice score
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=patience)  # goal: maximize Dice score
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
     criterion = nn.CrossEntropyLoss()
     global_step = 0
@@ -72,7 +73,7 @@ def train_net(net,
             "prediction" : {"mask_data" : pred_mask, "class_labels" : labels},
             "ground truth" : {"mask_data" : true_mask, "class_labels" : labels}})
 
-    # 5. Begin training
+    # Begin training
     for epoch in range(epochs):
         net.train()
         epoch_loss = 0
@@ -121,7 +122,7 @@ def train_net(net,
                             histograms['Weights/' + tag] = wandb.Histogram(value.data.cpu())
                             histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
 
-                        val_score = evaluate(net, val_loader, device)
+                        val_score, _ = evaluate(net, val_loader, device)
                         scheduler.step(val_score)
                         logging.info('Validation Dice score: {}'.format(val_score))
 
@@ -171,10 +172,14 @@ def get_args():
     parser.add_argument('--batch-size', '-b', dest='batch_size', metavar='B', type=int, default=16, help='Batch size')
     parser.add_argument('--learning-rate', '-l', metavar='LR', type=float, default=1e-5,
                         help='Learning rate', dest='lr')
+    parser.add_argument('--patience', '-p', metavar='P', type=int, default=2,
+                        help='LR Scheduler Patience', dest='patience')
+    parser.add_argument('--optimizer', '-o', metavar='O', type=str, default="RMS",
+                        help='Optimizer : Adam, SGD or RMS', dest='optimizer')
     parser.add_argument('--load', '-f', type=str, default=False, help='Load model from a .pth file')
-    parser.add_argument('--scale', '-s', type=float, default=0.5, help='Downscaling factor of the images')
-    parser.add_argument('--validation', '-v', dest='val', type=float, default=10.0,
-                        help='Percent of the data that is used as validation (0-100)')
+    # parser.add_argument('--scale', '-s', type=float, default=0.5, help='Downscaling factor of the images')
+    # parser.add_argument('--validation', '-v', dest='val', type=float, default=10.0,
+    #                     help='Percent of the data that is used as validation (0-100)')
     parser.add_argument('--amp', action='store_true', default=False, help='Use mixed precision')
     parser.add_argument('--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
 
@@ -196,7 +201,8 @@ if __name__ == '__main__':
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
 
     # Choose optimizer
-    optim_class = optim.RMSprop
+    optims = {"Adam" : optim.Adam, "SGD" : optim.SGD, "RMS" : optim.RMSprop}
+    optim_class = optims.get(args.optimizer,"Invalid optimizer input")
 
     logging.info(f'Network:\n'
                  f'\t{net.n_channels} input channels\n'
@@ -216,6 +222,7 @@ if __name__ == '__main__':
                   epochs=args.epochs,
                   batch_size=args.batch_size,
                   learning_rate=args.lr,
+                  patience=args.patience,
                   device=device,
                   amp=args.amp)
     except KeyboardInterrupt:

@@ -9,7 +9,8 @@ def evaluate(net, dataloader, device):
     net.eval()
     num_val_batches = len(dataloader)
     dice_score = 0
-
+    accuracy_score = 0
+    
     # iterate over the validation set
     for batch in tqdm(dataloader, total=num_val_batches, desc='Validation round', unit='batch', leave=False):
         image, mask_true = batch[0], batch[1]
@@ -38,4 +39,4 @@ def evaluate(net, dataloader, device):
     # Fixes a potential division by zero error
     if num_val_batches == 0:
         return dice_score
-    return dice_score / num_val_batches
+    return dice_score / num_val_batches, accuracy_score
