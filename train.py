@@ -122,7 +122,8 @@ def train_net(net,
                             histograms['Weights/' + tag] = wandb.Histogram(value.data.cpu())
                             histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
 
-                        val_score, _ = evaluate(net, val_loader, device)
+                        val_score = evaluate(net, val_loader, device)
+                        #val_score, _ = evaluate(net, val_loader, device)
                         scheduler.step(val_score)
                         logging.info('Validation Dice score: {}'.format(val_score))
 
@@ -194,8 +195,8 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = BBKDataset(zone = ("genf",), split = "train", buildings = True, vegetation = True, random_seed = 1)
-    val_set = BBKDataset(zone = ("genf",), split = "val", buildings = True, vegetation = True, random_seed = 1)
+    train_set = BBKDataset(zone = ("all",), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    val_set = BBKDataset(zone = ("all",), split = "val", buildings = True, vegetation = True, random_seed = 1)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
