@@ -32,7 +32,8 @@ def train_net(net,
               patience: int = 2,
               save_checkpoint: bool = True,
               amp: bool = False,
-              run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
+              run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+              ):
 
     # Create data loaders
     train_loader = DataLoader(train_set, shuffle=True, batch_size=batch_size)
