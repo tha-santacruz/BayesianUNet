@@ -218,8 +218,8 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = BBKDataset(zone = ("genf",), split = "train", buildings = True, vegetation = True, random_seed = 1)
-    val_set = BBKDataset(zone = ("genf",), split = "val", buildings = True, vegetation = True, random_seed = 1)
+    train_set = BBKDataset(zone = ("all",), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    val_set = BBKDataset(zone = ("all",), split = "val", buildings = True, vegetation = True, random_seed = 1)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
