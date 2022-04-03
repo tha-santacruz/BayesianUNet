@@ -52,6 +52,7 @@ def train_net(net,
         Optimizer:       {optim_class}
         Batch size:      {batch_size}
         Learning rate:   {learning_rate}
+        Patience of learning rate: {patience}
         Weight  decay:   {weight_decay}
         Momentum:        {momentum}
         Training size:   {n_train}
