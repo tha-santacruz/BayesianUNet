@@ -32,7 +32,7 @@ def train_net(net,
               patience: int = 2,
               save_checkpoint: bool = True,
               amp: bool = False,
-              run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+              #run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
               ):
 
     # Create data loaders
@@ -40,6 +40,9 @@ def train_net(net,
     val_loader = DataLoader(val_set, shuffle=False, batch_size=batch_size)
 
     # Initialize logging
+    
+    run_name = '-e' + str(epochs) + '-b' + str(batch_size) + '-l' + str(learning_rate) + '-p' + str(patience) + '-o' + str(optim_class)
+
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
 
     experiment.config.update(dict(
