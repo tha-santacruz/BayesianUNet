@@ -41,9 +41,18 @@ def train_net(net,
     # Initialize logging
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
 
-    experiment.config.update(dict(epochs=epochs, optim_class=optim_class, batch_size=batch_size, learning_rate=learning_rate,
-                                  weight_decay=weight_decay, momentum=momentum,
-                                  save_checkpoint=save_checkpoint, amp=amp, allow_val_change=True))
+    experiment.config.update(dict(
+                                epochs=epochs,
+                                optim_class=optim_class,
+                                batch_size=batch_size,
+                                learning_rate=learning_rate,
+                                patience = patience,
+                                weight_decay=weight_decay,
+                                momentum=momentum,
+                                save_checkpoint=save_checkpoint,
+                                amp=amp,
+                                allow_val_change=True)
+                                )
     n_val = len(val_set)
     n_train = len(train_set)
 
