@@ -27,6 +27,8 @@ def train_net(net,
               epochs: int = 5,
               batch_size: int = 32,
               learning_rate: float = 1e-5,
+              weight_decay = 0,
+              momentum = 0.9,
               patience: int = 2,
               save_checkpoint: bool = True,
               amp: bool = False,
@@ -40,6 +42,7 @@ def train_net(net,
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
 
     experiment.config.update(dict(epochs=epochs, optim_class=optim_class, batch_size=batch_size, learning_rate=learning_rate,
+                                  weight_decay=weight_decay, momentum=momentum,
                                   save_checkpoint=save_checkpoint, amp=amp, allow_val_change=True))
     n_val = len(val_set)
     n_train = len(train_set)
@@ -49,6 +52,8 @@ def train_net(net,
         Optimizer:       {optim_class}
         Batch size:      {batch_size}
         Learning rate:   {learning_rate}
+        Weight  decay:   {weight_decay}
+        Momentum:        {momentum}
         Training size:   {n_train}
         Validation size: {n_val}
         Checkpoints:     {save_checkpoint}
@@ -58,9 +63,9 @@ def train_net(net,
 
     # Set up the optimizer, the loss, the learning rate scheduler and the loss scaling for AMP
     try:
-        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8, momentum=0.9)
+        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=weight_decay, momentum=momentum)
     except:
-        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8)
+        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=weight_decay)
         
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=patience)  # goal: maximize Dice score
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
@@ -175,6 +180,10 @@ def get_args():
                         help='Learning rate', dest='lr')
     parser.add_argument('--patience', '-p', metavar='P', type=int, default=2,
                         help='LR Scheduler Patience', dest='patience')
+    parser.add_argument('--weight-decay', '-wd', metavar='WD', type=float, default=1e-8,
+                        help='Weight Decay of Optimizer', dest='weight_decay')
+    parser.add_argument('--momentum', '-m', metavar='M', type=float, default=0.9,
+                        help='Momentum of Optimizer', dest='momentum')
     parser.add_argument('--optimizer', '-o', metavar='O', type=str, default="RMS",
                         help='Optimizer : Adam, SGD or RMS', dest='optimizer')
     parser.add_argument('--load', '-f', type=str, default=False, help='Load model from a .pth file')
@@ -195,8 +204,8 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = BBKDataset(zone = ("all",), split = "train", buildings = True, vegetation = True, random_seed = 1)
-    val_set = BBKDataset(zone = ("all",), split = "val", buildings = True, vegetation = True, random_seed = 1)
+    train_set = BBKDataset(zone = ("genf",), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    val_set = BBKDataset(zone = ("genf",), split = "val", buildings = True, vegetation = True, random_seed = 1)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
@@ -223,6 +232,8 @@ if __name__ == '__main__':
                   epochs=args.epochs,
                   batch_size=args.batch_size,
                   learning_rate=args.lr,
+                  weight_decay=args.weight_decay,
+                  momentum=args.momentum,
                   patience=args.patience,
                   device=device,
                   amp=args.amp)
