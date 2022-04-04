@@ -27,20 +27,36 @@ def train_net(net,
               epochs: int = 5,
               batch_size: int = 32,
               learning_rate: float = 1e-5,
+              weight_decay = 0,
+              momentum = 0.9,
               patience: int = 2,
               save_checkpoint: bool = True,
               amp: bool = False,
-              run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
+              #run_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+              ):
 
     # Create data loaders
     train_loader = DataLoader(train_set, shuffle=True, batch_size=batch_size)
-    val_loader = DataLoader(val_set, shuffle=False, drop_last=True, batch_size=batch_size)
+    val_loader = DataLoader(val_set, shuffle=False, batch_size=batch_size)
 
     # Initialize logging
+    
+    run_name = '-e ' + str(epochs) + ' -b ' + str(batch_size) + ' -l ' + str(learning_rate) + ' -p ' + str(patience) + ' -o ' + str(optim_class)
+
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
 
-    experiment.config.update(dict(epochs=epochs, optim_class=optim_class, batch_size=batch_size, learning_rate=learning_rate,
-                                  save_checkpoint=save_checkpoint, amp=amp, allow_val_change=True))
+    experiment.config.update(dict(
+                                epochs=epochs,
+                                optim_class=optim_class,
+                                batch_size=batch_size,
+                                learning_rate=learning_rate,
+                                patience = patience,
+                                weight_decay=weight_decay,
+                                momentum=momentum,
+                                save_checkpoint=save_checkpoint,
+                                amp=amp,
+                                allow_val_change=True)
+                                )
     n_val = len(val_set)
     n_train = len(train_set)
 
@@ -49,6 +65,9 @@ def train_net(net,
         Optimizer:       {optim_class}
         Batch size:      {batch_size}
         Learning rate:   {learning_rate}
+        Patience of learning rate: {patience}
+        Weight  decay:   {weight_decay}
+        Momentum:        {momentum}
         Training size:   {n_train}
         Validation size: {n_val}
         Checkpoints:     {save_checkpoint}
@@ -58,9 +77,9 @@ def train_net(net,
 
     # Set up the optimizer, the loss, the learning rate scheduler and the loss scaling for AMP
     try:
-        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8, momentum=0.9)
+        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=weight_decay, momentum=momentum)
     except:
-        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=1e-8)
+        optimizer = optim_class(net.parameters(), lr=learning_rate, weight_decay=weight_decay)
         
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=patience)  # goal: maximize Dice score
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
@@ -122,7 +141,8 @@ def train_net(net,
                             histograms['Weights/' + tag] = wandb.Histogram(value.data.cpu())
                             histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
 
-                        val_score, _ = evaluate(net, val_loader, device)
+                        val_score = evaluate(net, val_loader, device)
+                        #val_score, _ = evaluate(net, val_loader, device)
                         scheduler.step(val_score)
                         logging.info('Validation Dice score: {}'.format(val_score))
 
@@ -174,12 +194,13 @@ def get_args():
                         help='Learning rate', dest='lr')
     parser.add_argument('--patience', '-p', metavar='P', type=int, default=2,
                         help='LR Scheduler Patience', dest='patience')
+    parser.add_argument('--weight-decay', '-wd', metavar='WD', type=float, default=1e-8,
+                        help='Weight Decay of Optimizer', dest='weight_decay')
+    parser.add_argument('--momentum', '-m', metavar='M', type=float, default=0.9,
+                        help='Momentum of Optimizer', dest='momentum')
     parser.add_argument('--optimizer', '-o', metavar='O', type=str, default="RMS",
                         help='Optimizer : Adam, SGD or RMS', dest='optimizer')
     parser.add_argument('--load', '-f', type=str, default=False, help='Load model from a .pth file')
-    # parser.add_argument('--scale', '-s', type=float, default=0.5, help='Downscaling factor of the images')
-    # parser.add_argument('--validation', '-v', dest='val', type=float, default=10.0,
-    #                     help='Percent of the data that is used as validation (0-100)')
     parser.add_argument('--amp', action='store_true', default=False, help='Use mixed precision')
     parser.add_argument('--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
 
@@ -194,8 +215,8 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = BBKDataset(zone = ("genf",), split = "train", buildings = True, vegetation = True, random_seed = 1)
-    val_set = BBKDataset(zone = ("genf",), split = "val", buildings = True, vegetation = True, random_seed = 1)
+    train_set = BBKDataset(zone = ("all",), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    val_set = BBKDataset(zone = ("all",), split = "val", buildings = True, vegetation = True, random_seed = 1)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
@@ -222,6 +243,8 @@ if __name__ == '__main__':
                   epochs=args.epochs,
                   batch_size=args.batch_size,
                   learning_rate=args.lr,
+                  weight_decay=args.weight_decay,
+                  momentum=args.momentum,
                   patience=args.patience,
                   device=device,
                   amp=args.amp)
