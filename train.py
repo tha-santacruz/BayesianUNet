@@ -41,7 +41,7 @@ def train_net(net,
 
     # Initialize logging
     
-    run_name = '-e ' + str(epochs) + ' -b ' + str(batch_size) + ' -l ' + str(learning_rate) + ' -p ' + str(patience) + ' -o ' + str(optim_class)
+    run_name = 'train.py' + '-e ' + str(epochs) + ' -b ' + str(batch_size) + ' -l ' + str(learning_rate) + ' -p ' + str(patience) 
 
     experiment = wandb.init(project="Baseline U-NET", entity="bbk_2022", resume='allow', name = run_name)
 
