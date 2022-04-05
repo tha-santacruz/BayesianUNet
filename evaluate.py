@@ -4,8 +4,7 @@ import torch
 import torch.nn.functional as F
 from tqdm import tqdm
 
-from utils.dice_score import multiclass_dice_coeff, dice_coeff
-from utils.accuracy import accuracy_coeff, multiclass_accuracy
+import utils.metrics as metrics
 
 def evaluate(net, dataloader, device):
     net.eval()
@@ -21,14 +20,14 @@ def evaluate(net, dataloader, device):
         mask_true = mask_true.to(device=device, dtype=torch.float32)
 
         with torch.no_grad():
-            # predict the mask
+            # predict the mask (pytorch tensor have the following structure : [batch_no, class, pixel_x, pixel_y])
             mask_pred = net(image)
 
             # convert to one-hot format
             if net.n_classes == 1:
                 mask_pred = (F.sigmoid(mask_pred) > 0.5).float()
                 # compute the Dice score
-                dice_score += dice_coeff(mask_pred, mask_true, reduce_batch_first=False)
+                dice_score += metrics.dice_coeff(mask_pred, mask_true, reduce_batch_first=False)
             else:
                 
                 
@@ -37,12 +36,12 @@ def evaluate(net, dataloader, device):
                 mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0, 3, 1, 2).float()
                 
                  #compute the accuracy
-                accuracy_score += accuracy_coeff(mask_pred.to(torch.int64)[:, 1:, ...], mask_true.to(torch.int64)[:, 1:, ...])
+                accuracy_score += metrics.accuracy_coeff(mask_pred.to(torch.int64)[:, 1:, ...], mask_true.to(torch.int64)[:, 1:, ...])
                 # compute the Dice score, ignoring background
-                dice_score += multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
+                dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
                 
                 #compute accuracy per class
-                accuracy_per_class = multiclass_accuracy(mask_preds_accuracy.to(torch.int64)[:, 1:, ...], torch.softmax(mask_true, dim=1).argmax(dim=1).to(torch.int64)[:, 1:, ...], num_classes = net.n_classes)
+                accuracy_per_class = metrics.multiclass_accuracy(mask_preds_accuracy.to(torch.int64)[:, 1:, ...], torch.softmax(mask_true, dim=1).argmax(dim=1).to(torch.int64)[:, 1:, ...], num_classes = net.n_classes)
                #TODO: take the accuracy, dice score,  per classe and take it out the loop to compute them globally 
            
 
@@ -50,5 +49,6 @@ def evaluate(net, dataloader, device):
 
     # Fixes a potential division by zero error
     if num_val_batches == 0:
-        return dice_score
+        return dice_score, accuracy_score, accuracy_per_class
+
     return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class #/num_val_batches
