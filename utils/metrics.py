@@ -40,7 +40,7 @@ def dice_loss(input: Tensor, target: Tensor, multiclass: bool = False):
     return 1 - fn(input, target, reduce_batch_first=True)
 
 
-def accuracy_coeff(preds, target ):
+def accuracy_coeff(preds, target, num_classes):
     #assert input.size() == target.size()
     return torchmetrics.functional.accuracy(preds = preds,
                                             target = target,
@@ -49,7 +49,7 @@ def accuracy_coeff(preds, target ):
                                             threshold=0.5,
                                             top_k=None,
                                             subset_accuracy=False,
-                                            num_classes=7,
+                                            num_classes=num_classes,
                                             multiclass=None,
                                             ignore_index=None)
 

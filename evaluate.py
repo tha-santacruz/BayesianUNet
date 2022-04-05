@@ -11,6 +11,7 @@ def evaluate(net, dataloader, device):
     num_val_batches = len(dataloader)
     dice_score = 0
     accuracy_score = 0
+    accuracy_per_class = 0
 
     # iterate over the validation set
     for batch in tqdm(dataloader, total=num_val_batches, desc='Validation round', unit='batch', leave=False):
@@ -29,20 +30,33 @@ def evaluate(net, dataloader, device):
                 # compute the Dice score
                 dice_score += metrics.dice_coeff(mask_pred, mask_true, reduce_batch_first=False)
             else:
+                logging.info('Mask true size :{}'.format(mask_true.size()))
+                logging.info('Mask pred size :{}'.format(mask_pred.size()))
 
-                #transform preidiction in one-hot to compute dice score (ignoring background for dice score)
-                mask_pred_dice = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0, 3, 1, 2).float()
-                # compute the Dice score, 
-                dice_score += metrics.multiclass_dice_coeff(mask_pred_dice[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
-
+                
                 #transform predictions to float labels for others metrics
-                mask_preds = mask_pred.argmax(dim=1).to(torch.int64)[:, 1:, ...]
-                mask_true = torch.softmax(mask_true, dim=1).argmax(dim=1).to(torch.int64)[:, 1:, ...]
-                 #compute the accuracy
-                accuracy_score += metrics.accuracy_coeff(mask_pred, mask_true)
-                #compute accuracy per class
-                accuracy_per_class = metrics.multiclass_accuracy(mask_preds, mask_true, num_classes = net.n_classes)
+                mask_pred_labels = mask_pred.argmax(dim=1) 
+                #mask_true_labels = torch.softmax(mask_true, dim=1).argmax(dim=1)
+                mask_true_labels = mask_true.argmax(dim=1)
 
+                #logging.info('Mask true size labels :{}'.format(mask_true_labels.size()))
+                #logging.info('Mask pred size labels :{}'.format(mask_pred_labels.size()))
+
+                #compute the accuracy
+                accuracy_score += metrics.accuracy_coeff(mask_pred_labels[:, 1:, ...], mask_true_labels[:, 1:, ...], num_classes = net.n_classes)
+                #compute accuracy per class
+                accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels[:, 1:, ...], mask_true_labels[:, 1:, ...], num_classes = net.n_classes)
+
+
+                #transform prediction in one-hot to compute dice score (ignoring background for dice score)
+                mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
+
+                # compute the Dice score, 
+                dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
+
+                #F1_coeff_per_class = 
+
+                
                #TODO: take the accuracy, dice score,  per classe and take it out the loop to compute them globally 
            
 
@@ -52,4 +66,4 @@ def evaluate(net, dataloader, device):
     if num_val_batches == 0:
         return dice_score, accuracy_score, accuracy_per_class
 
-    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class #/num_val_batches
+    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches

@@ -124,7 +124,7 @@ def train_net(net,
 
                         #val_score = evaluate(net, val_loader, device)
                         val_score, accuracy_score, accuracy_per_class = evaluate(net, val_loader, device)
-                        logging.info('Accuracy score : {}'.format(accuracy_score.float()))
+                        logging.info('Accuracy score : {}'.format(accuracy_score))
                         logging.info('Global accuracy score per class : {}'.format(accuracy_per_class))
                         scheduler.step(val_score)
                         logging.info('Validation Dice score: {}'.format(val_score))
