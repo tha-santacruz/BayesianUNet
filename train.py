@@ -169,11 +169,21 @@ def train_net(net,
                                         6 : "ruderal_area",
                                         7 : "without_vegetation", 
                                         8 : "buildings"}
+                        scores = {
+                                'Accuracy': accuracy_per_class,
+                                'F1 score' : F1_score
+                                }
+                        
+                        columns_table= list(class_labels.values())
+                        data_table = [accuracy_per_class, F1_score]
+                        score_table = wandb.Table(data = data_table, columns=columns_table)
+
 
                         experiment.log({
                             'learning rate': optimizer.param_groups[0]['lr'],
                             'validation Dice': val_score,
                             'Global accuracy score': accuracy_score,
+                            'Metrique per class':score_table, 
                             'images': wandb.Image(images[0][:3].cpu()
                                                     ),
                             'masks': {
