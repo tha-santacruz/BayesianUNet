@@ -144,7 +144,7 @@ def train_net(net,
                         val_score, accuracy_score, accuracy_per_class, F1_score, cf_matrix = evaluate(net, val_loader, device)
                         logging.info('Accuracy score : {}'.format(accuracy_score))
                         logging.info('Global accuracy score per class : {}'.format(accuracy_per_class))
-                        logging.info('F1 score : {}'.format(F1_score))
+                        #logging.info('F1 score : {}'.format(F1_score))
                         scheduler.step(val_score)
                         logging.info('Validation Dice score: {}'.format(val_score))
 
