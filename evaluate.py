@@ -3,7 +3,8 @@ import logging
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
-
+from sklearn.metrics import confusion_matrix
+import numpy as np
 import utils.metrics as metrics
 
 def evaluate(net, dataloader, device):
@@ -12,6 +13,7 @@ def evaluate(net, dataloader, device):
     dice_score = 0
     accuracy_score = 0
     accuracy_per_class = 0
+    cf_matrix = np.zeros(shape = (net.n_classes,net.n_classes))
 
     # iterate over the validation set
     for batch in tqdm(dataloader, total=num_val_batches, desc='Validation round', unit='batch', leave=False):
@@ -23,6 +25,9 @@ def evaluate(net, dataloader, device):
         with torch.no_grad():
             # predict the mask (pytorch tensor have the following structure : [batch_no, class, pixel_x, pixel_y])
             mask_pred = net(image)
+
+            # compute confidence matrix
+            cf_matrix = cf_matrix + confusion_matrix(mask_true.argmax(dim=1).view(-1).cpu(),mask_pred.argmax(dim=1).view(-1).cpu(), labels = np.arange(0,9))
 
             # convert to one-hot format
             if net.n_classes == 1:
@@ -51,4 +56,4 @@ def evaluate(net, dataloader, device):
     if num_val_batches == 0:
         return dice_score, accuracy_score, accuracy_per_class
 
-    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches
+    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches, cf_matrix
