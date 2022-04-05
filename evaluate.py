@@ -10,9 +10,12 @@ import utils.metrics as metrics
 def evaluate(net, dataloader, device):
     net.eval()
     num_val_batches = len(dataloader)
+
+    #Initialization
     dice_score = 0
     accuracy_score = 0
     accuracy_per_class = 0
+    F1_coeff_per_class  = 0
     cf_matrix = np.zeros(shape = (net.n_classes,net.n_classes))
 
     # iterate over the validation set
@@ -43,7 +46,7 @@ def evaluate(net, dataloader, device):
                 accuracy_score += metrics.accuracy_coeff(mask_pred_labels[:, 1:, ...], mask_true_labels[:, 1:, ...], num_classes = net.n_classes)
                 #compute accuracy per class
                 accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels[:, 1:, ...], mask_true_labels[:, 1:, ...], num_classes = net.n_classes)
-                #F1_coeff_per_class =   
+                F1_coeff_per_class += metrics.F1_score(mask_pred_labels[:, 1:, ...], mask_true_labels[:, 1:, ...], num_classes= net.n_classes)
 
                 #transform prediction in one-hot to compute dice score (ignoring background for dice score)
                 mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
@@ -56,4 +59,4 @@ def evaluate(net, dataloader, device):
     if num_val_batches == 0:
         return dice_score, accuracy_score, accuracy_per_class
 
-    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches, cf_matrix
+    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches, F1_coeff_per_class/num_val_batches, cf_matrix

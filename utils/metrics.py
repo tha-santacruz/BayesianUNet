@@ -68,7 +68,7 @@ def multiclass_accuracy(preds, target, num_classes):
                                             ignore_index=None)
 
 def F1_score(preds, target, num_classes):
-    return F1Score(num_classes=num_classes,
+    return torchmetrics.F1Score(num_classes=num_classes,
                     threshold=0.5,
                     average=None,
                     mdmc_average='global',
