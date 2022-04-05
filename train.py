@@ -156,8 +156,6 @@ def train_net(net,
 
                         # create confusion matrix object
                         plt.figure()
-                        #group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
-                        #box_labels = np.asarray(group_percentages).reshape(cf_matrix.shape[0],cf_matrix.shape[1])
                         sns.heatmap(cf_matrix, annot=True, fmt='.2%', cmap='Blues', cbar=True, xticklabels=val_set.BBK_CLASSES_list,yticklabels=val_set.BBK_CLASSES_list)
 
                         class_labels = {0 : "null",
