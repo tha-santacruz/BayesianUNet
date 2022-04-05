@@ -216,7 +216,7 @@ if __name__ == '__main__':
 
     # Create datasets
     train_set = BBKDataset(zone = ("wallis",), split = "train", buildings = True, vegetation = True, random_seed = 1)
-    val_set = BBKDataset(zone = ("wallis",), split = "val", buildings = True, vegetation = True, random_seed = 1)
+    val_set = BBKDataset(zone = ("goesch",), split = "val", buildings = True, vegetation = True, random_seed = 1)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)

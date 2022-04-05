@@ -25,7 +25,6 @@ class BBKDataset:
         self.rnd_flips = A.Compose([A.HorizontalFlip(p=0.5),A.VerticalFlip(p=0.5)])
 
         # Handle data coverage zone
-        print(any("wallis" in el for el in zone))
         self.zone = []
         if isinstance(zone, tuple):
             if any("ticino" in el for el in zone):
@@ -89,16 +88,22 @@ class BBKDataset:
                         else:
                             F.relu(file_content, inplace=True)
                             m = file_content.mean(dim=[0,1])
-                            self.mean_vals_tiles = torch.cat((self.mean_vals_tiles,m.unsqueeze(dim=1)),dim=1)
                             s = file_content.std(dim=[0,1])
-                            self.std_vals_tiles = torch.cat((self.std_vals_tiles,s.unsqueeze(dim=1)),dim=1)
+                            if any(torch.isnan(m)) | any(torch.isnan(s)):
+                                valid = False
+                            else:
+                                self.mean_vals_tiles = torch.cat((self.mean_vals_tiles,m.unsqueeze(dim=1)),dim=1)
+                                self.std_vals_tiles = torch.cat((self.std_vals_tiles,s.unsqueeze(dim=1)),dim=1)
                     elif self.folders[f] == "hoe_50m/":
                         file_content = torch.tensor(imread(self.ROOT+z+self.folders[f]+couple+self.appendix[f]))
                         F.relu(file_content, inplace=True)
                         m = file_content.mean()
-                        self.mean_vals_vegetation = torch.cat((self.mean_vals_vegetation,m.unsqueeze(dim=0)),dim=0)
                         s = file_content.std()
-                        self.std_vals_vegetation = torch.cat((self.std_vals_vegetation,s.unsqueeze(dim=0)),dim=0)
+                        if torch.isnan(m) | torch.isnan(s):
+                            valid = False
+                        else:
+                            self.mean_vals_vegetation = torch.cat((self.mean_vals_vegetation,m.unsqueeze(dim=0)),dim=0)
+                            self.std_vals_vegetation = torch.cat((self.std_vals_vegetation,s.unsqueeze(dim=0)),dim=0)
                             
                 if valid:
                     self.coordinates.append([couple, z])
