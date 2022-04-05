@@ -1,9 +1,9 @@
 import torchmetrics
 #test branch
 def accuracy_coeff(preds, target ):
-    assert input.size() == target.size()
+    #assert input.size() == target.size()
     return torchmetrics.functional.accuracy(preds = preds,
-                                            target = preds,
+                                            target = target,
                                             average='macro',
                                             mdmc_average='global',
                                             threshold=0.5,
@@ -17,7 +17,7 @@ def accuracy_coeff(preds, target ):
 def multiclass_accuracy(preds, target, num_classes):
 
     return torchmetrics.functional.accuracy(preds = preds,
-                                            target = preds,
+                                            target = target,
                                             average=None,
                                             mdmc_average='global',
                                             threshold=0.5,

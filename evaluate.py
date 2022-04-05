@@ -32,12 +32,12 @@ def evaluate(net, dataloader, device):
                 mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0, 3, 1, 2).float()
                 
                  #compute the accuracy
-                accuracy_score += accuracy_coeff(mask_pred.int()[:, 1:, ...], mask_true[:, 1:, ...])
+                accuracy_score += accuracy_coeff(mask_pred.to(torch.int64)[:, 1:, ...], mask_true.to(torch.int64)[:, 1:, ...])
                 # compute the Dice score, ignoring background
                 #TODO : do we really have to ignore the first class ?
                 dice_score += multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
                 
-               
+               #TODO: take the accuracy and dice score per classe and take it out the loop to compute them globally
            
 
     net.train()
@@ -45,4 +45,4 @@ def evaluate(net, dataloader, device):
     # Fixes a potential division by zero error
     if num_val_batches == 0:
         return dice_score
-    return dice_score / num_val_batches, accuracy_score
+    return dice_score / num_val_batches, accuracy_score/num_val_batches
