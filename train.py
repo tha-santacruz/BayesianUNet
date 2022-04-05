@@ -142,7 +142,7 @@ def train_net(net,
                             histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
 
                         #val_score = evaluate(net, val_loader, device)
-                        val_score, accuracy_score, accuracy_per_class = evaluate(net, val_loader, device)
+                        val_score, accuracy_score, accuracy_per_class, _ = evaluate(net, val_loader, device)
                         logging.info('Accuracy score : {}'.format(accuracy_score))
                         logging.info('Global accuracy score per class : {}'.format(accuracy_per_class))
                         scheduler.step(val_score)
@@ -161,7 +161,7 @@ def train_net(net,
                         experiment.log({
                             'learning rate': optimizer.param_groups[0]['lr'],
                             'validation Dice': val_score,
-                            'Global accuracy score': accuracy_coeff,
+                            'Global accuracy score': accuracy_score,
                             'images': wandb.Image(images[0][:3].cpu()
                                                     ),
                             'masks': {
@@ -218,8 +218,8 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = BBKDataset(zone = ("alles",), split = "train", buildings = True, vegetation = True, random_seed = 1)
-    val_set = BBKDataset(zone = ("alles",), split = "val", buildings = True, vegetation = True, random_seed = 1)
+    train_set = BBKDataset(zone = ("genf",), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    val_set = BBKDataset(zone = ("genf",), split = "val", buildings = True, vegetation = True, random_seed = 1)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
