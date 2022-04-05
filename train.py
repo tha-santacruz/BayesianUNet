@@ -156,7 +156,7 @@ def train_net(net,
 
                         # create confusion matrix object
                         plt.figure()
-                        sns.heatmap(cf_matrix, annot=True, fmt='.2', cmap='Blues', cbar=True, xticklabels=val_set.BBK_CLASSES_list,yticklabels=val_set.BBK_CLASSES_list)
+                        sns.heatmap(cf_matrix, annot=True, fmt='.2%', cmap='Blues', cbar=True, xticklabels=val_set.BBK_CLASSES_list,yticklabels=val_set.BBK_CLASSES_list)
 
                         class_labels = {0 : "null",
                                         1 : "wooded_area",
@@ -235,8 +235,8 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = BBKDataset(zone = ("genf",), split = "train", buildings = True, vegetation = True, random_seed = 1)
-    val_set = BBKDataset(zone = ("genf",), split = "val", buildings = True, vegetation = True, random_seed = 1)
+    train_set = BBKDataset(zone = ("alles",), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    val_set = BBKDataset(zone = ("alles",), split = "val", buildings = True, vegetation = True, random_seed = 1)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
