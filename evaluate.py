@@ -43,9 +43,9 @@ def evaluate(net, dataloader, device):
                 mask_pred_labels = mask_pred.argmax(dim=1) 
                 mask_true_labels = mask_true.argmax(dim=1)
                 #compute the accuracy
-                accuracy_score += metrics.accuracy_coeff(mask_pred_labels[:, 1:, ...], mask_true_labels[:, 1:, ...], num_classes = net.n_classes)
+                accuracy_score += metrics.accuracy_coeff(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
                 #compute accuracy per class
-                accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels[:, 1:, ...], mask_true_labels[:, 1:, ...], num_classes = net.n_classes)
+                accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
                 F1_coeff_per_class += metrics.F1_score(mask_pred_labels[:, 1:, ...], mask_true_labels[:, 1:, ...], num_classes= net.n_classes)
 
                 #transform prediction in one-hot to compute dice score (ignoring background for dice score)
