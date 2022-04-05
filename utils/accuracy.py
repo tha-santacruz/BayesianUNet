@@ -1,7 +1,7 @@
 import torchmetrics
 #test branch
 def accuracy_coeff(preds, target ):
-    assert input.size() == target.size(
+    assert input.size() == target.size()
     return torchmetrics.functional.accuracy(preds = preds,
                                             target = preds,
                                             average='macro',
