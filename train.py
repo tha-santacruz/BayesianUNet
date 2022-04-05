@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 
 from utils.dataset import BBKDataset
-from utils.dice_score import dice_loss
+from utils.metrics import dice_loss
 from evaluate import evaluate
 from unet import UNet
 
