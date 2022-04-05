@@ -3,13 +3,14 @@ import torch.nn.functional as F
 from tqdm import tqdm
 
 from utils.dice_score import multiclass_dice_coeff, dice_coeff
-from utils.accuracy import accuracy_coeff
+from utils.accuracy import accuracy_coeff, multiclass_accuracy
 
 def evaluate(net, dataloader, device):
     net.eval()
     num_val_batches = len(dataloader)
     dice_score = 0
     accuracy_score = 0
+
     # iterate over the validation set
     for batch in tqdm(dataloader, total=num_val_batches, desc='Validation round', unit='batch', leave=False):
         image, mask_true = batch[0], batch[1]
@@ -34,10 +35,11 @@ def evaluate(net, dataloader, device):
                  #compute the accuracy
                 accuracy_score += accuracy_coeff(mask_pred.to(torch.int64)[:, 1:, ...], mask_true.to(torch.int64)[:, 1:, ...])
                 # compute the Dice score, ignoring background
-                #TODO : do we really have to ignore the first class ?
                 dice_score += multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
                 
-               #TODO: take the accuracy and dice score per classe and take it out the loop to compute them globally
+                #compute accuracy per class
+                accuracy_per_class = multiclass_accuracy(mask_pred.to(torch.int64)[:, 1:, ...], mask_true.to(torch.int64)[:, 1:, ...], num_classes = 9)
+               #TODO: take the accuracy, dice score,  per classe and take it out the loop to compute them globally 
            
 
     net.train()
@@ -45,4 +47,4 @@ def evaluate(net, dataloader, device):
     # Fixes a potential division by zero error
     if num_val_batches == 0:
         return dice_score
-    return dice_score / num_val_batches, accuracy_score/num_val_batches
+    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class #/num_val_batches

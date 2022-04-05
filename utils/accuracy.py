@@ -22,7 +22,7 @@ def multiclass_accuracy(preds, target, num_classes):
                                             mdmc_average='global',
                                             threshold=0.5,
                                             top_k=None,
-                                            subset_accuracy=True,
+                                            subset_accuracy=False,
                                             num_classes=num_classes,
                                             multiclass=None,
                                             ignore_index=None)
