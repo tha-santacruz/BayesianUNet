@@ -10,7 +10,7 @@ import random
 import albumentations as A
 
 class BBKDataset:
-    def __init__(self, zone: tuple = ("all",), split: str = "train", random_seed = 1,
+    def __init__(self, zone: tuple = ("alles",), split: str = "train", random_seed = 1,
                  buildings: bool = True, vegetation: bool = True, augment: bool = True):
         """Initialization method"""
         # Constants
@@ -25,6 +25,7 @@ class BBKDataset:
         self.rnd_flips = A.Compose([A.HorizontalFlip(p=0.5),A.VerticalFlip(p=0.5)])
 
         # Handle data coverage zone
+        print(any("wallis" in el for el in zone))
         self.zone = []
         if isinstance(zone, tuple):
             if any("ticino" in el for el in zone):
@@ -37,9 +38,9 @@ class BBKDataset:
                 self.zone.append("jura/")
             if any("wallis" in el for el in zone):
                 self.zone.append("wallis/")
-            if any("all" in el for el in zone):
+            if any("alles" in el for el in zone):
                 if len(zone)>1:
-                    raise ValueError("zone cannot contain either 'all' or other zones")
+                    raise ValueError("zone cannot contain either 'alles' or other zones")
                 else:
                     self.zone = ["ticino/","genf/","goesch/","jura/","wallis/"]
         else:
