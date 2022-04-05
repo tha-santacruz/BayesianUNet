@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 
 from utils.dataset import BBKDataset
-from utils.dice_score import dice_loss
+from utils.metrics import dice_loss
 from evaluate import evaluate
 from unet import UNet
 
@@ -141,8 +141,10 @@ def train_net(net,
                             histograms['Weights/' + tag] = wandb.Histogram(value.data.cpu())
                             histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
 
-                        val_score = evaluate(net, val_loader, device)
-                        #val_score, _ = evaluate(net, val_loader, device)
+                        #val_score = evaluate(net, val_loader, device)
+                        val_score, accuracy_score, accuracy_per_class = evaluate(net, val_loader, device)
+                        logging.info('Accuracy score : {}'.format(accuracy_score))
+                        logging.info('Global accuracy score per class : {}'.format(accuracy_per_class))
                         scheduler.step(val_score)
                         logging.info('Validation Dice score: {}'.format(val_score))
 
@@ -256,3 +258,5 @@ if __name__ == '__main__':
         torch.save(net.state_dict(), 'INTERRUPTED.pth')
         logging.info('Saved interrupt')
         sys.exit(0)
+
+    #TODO : implement a way to calculate the score on the val set with the trained model
