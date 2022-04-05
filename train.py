@@ -17,6 +17,12 @@ from utils.metrics import dice_loss
 from evaluate import evaluate
 from unet import UNet
 
+import matplotlib.pyplot as plt
+from sklearn.metrics import ConfusionMatrixDisplay
+import pandas as pd
+import seaborn as sns
+import numpy as np
+
 dir_checkpoint = Path('./checkpoints/')
 
 def train_net(net,
@@ -148,6 +154,12 @@ def train_net(net,
                         scheduler.step(val_score)
                         logging.info('Validation Dice score: {}'.format(val_score))
 
+                        # create confusion matrix object
+                        plt.figure()
+                        #group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
+                        #box_labels = np.asarray(group_percentages).reshape(cf_matrix.shape[0],cf_matrix.shape[1])
+                        sns.heatmap(cf_matrix, annot=True, fmt='.2%', cmap='Blues', cbar=True, xticklabels=val_set.BBK_CLASSES_list,yticklabels=val_set.BBK_CLASSES_list)
+
                         class_labels = {0 : "null",
                                         1 : "wooded_area",
                                         2 : "water",
@@ -170,11 +182,7 @@ def train_net(net,
                             },
                             'step': global_step,
                             'epoch': epoch,
-                            'conf_mat' : wandb.plot.confusion_matrix(probs=None,
-                                                                     y_true = torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy().flatten(),
-                                                                     preds = torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy().flatten(),
-                                                                     class_names = ["null","wooded_area", "water", "bushes", "individual_tree", "no_woodland", "ruderal_area","without_vegetation", "buildings"] 
-                                                                    ),
+                            'conf_mat' : wandb.Image(plt),
                             'predictions': wb_mask(images[0][:3].cpu(),
                                                    torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy(),
                                                    torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy(),
