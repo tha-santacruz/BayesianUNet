@@ -1,3 +1,5 @@
+import logging 
+
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
@@ -29,7 +31,9 @@ def evaluate(net, dataloader, device):
                 dice_score += dice_coeff(mask_pred, mask_true, reduce_batch_first=False)
             else:
                 
-
+                
+                mask_preds_accuracy = mask_pred.argmax(dim=1)
+                logging.info(mask_preds_accuracy)
                 mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0, 3, 1, 2).float()
                 
                  #compute the accuracy
@@ -38,7 +42,7 @@ def evaluate(net, dataloader, device):
                 dice_score += multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
                 
                 #compute accuracy per class
-                accuracy_per_class = multiclass_accuracy(mask_pred.to(torch.int64)[:, 1:, ...], mask_true.to(torch.int64)[:, 1:, ...], num_classes = 9)
+                accuracy_per_class = multiclass_accuracy(mask_preds_accuracy.to(torch.int64)[:, 1:, ...], torch.softmax(mask_true, dim=1).argmax(dim=1).to(torch.int64)[:, 1:, ...], num_classes = net.n_classes)
                #TODO: take the accuracy, dice score,  per classe and take it out the loop to compute them globally 
            
 
