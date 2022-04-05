@@ -236,6 +236,7 @@ if __name__ == '__main__':
 
     net.to(device=device)
     try:
+        logging.info('Training model')
         train_net(net=net,
                   val_set=val_set,
                   train_set=train_set,
@@ -248,6 +249,9 @@ if __name__ == '__main__':
                   patience=args.patience,
                   device=device,
                   amp=args.amp)
+        logging.info('Evaluating trained model')
+        scores = evaluate(net=net,dataloader=DataLoader(val_set, shuffle=False, batch_size=batch_size),device=device)
+        print(scores)
     except KeyboardInterrupt:
         torch.save(net.state_dict(), 'INTERRUPTED.pth')
         logging.info('Saved interrupt')
