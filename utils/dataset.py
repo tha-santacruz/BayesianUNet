@@ -128,8 +128,10 @@ class BBKDataset:
             self.split_coordinates = self.coordinates[self.split_counts[0]:self.split_counts[1]]
         elif split == "val":
             self.split_coordinates = self.coordinates[self.split_counts[0]+self.split_counts[1]:]
+        elif split =="all":
+            self.split_coordinates = self.coordinates
         else:
-            raise ValueError("Invalid split : values can be 'train', 'test' or 'val'")
+            raise ValueError("Invalid split : values can be 'train', 'test', 'val' or 'all'")
         self.split = split
         self.augment = augment
         

@@ -1,7 +1,7 @@
 from utils.dataset import BBKDataset
 from torch.utils.data import DataLoader
 
-bbkd = BBKDataset(zone = ("wallis",),split="train")
+bbkd = BBKDataset(zone = ("wallis",),split="all")
 print(len(bbkd))
 dl = DataLoader(bbkd, batch_size=64, shuffle=True)
 x = next(iter(dl))
