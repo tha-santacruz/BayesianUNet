@@ -12,7 +12,7 @@ import albumentations as A
 
 class BBKDataset:
     def __init__(self, zone: tuple = ("alles",), split: str = "train", random_seed = 1,
-                 buildings: bool = True, vegetation: bool = True, augment: bool = False):
+                 buildings: bool = True, vegetation: bool = True, augment: bool = True):
         """Initialization method"""
         # Constants
         self.ROOT = "./../data/"
