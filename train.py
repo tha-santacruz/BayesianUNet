@@ -98,6 +98,25 @@ def train_net(net,
             "prediction" : {"mask_data" : pred_mask, "class_labels" : labels},
             "ground truth" : {"mask_data" : true_mask, "class_labels" : labels}})
 
+    #utils to set the colors on the interactive masks on wandb
+    #TODO: deplace this block in utils 
+    colors_dict =   {0 : 1,
+                    1 : 13,
+                    2 : 0,
+                    3 : 8,
+                    4 : 2,
+                    5 : 12,
+                    6 : 11,
+                    7 : 15, 
+                    8 : 3}
+
+    def set_bbk_colors(img):
+        return np.vectorize(colors_dict.get)(img)
+
+    def set_classlabels(class_labels):
+        new_dict = {newkey: class_labels[oldkey] for (oldkey, newkey) in colors_dict.items()}
+        return new_dict
+
     # Begin training
     for epoch in range(epochs):
         net.train()
@@ -194,9 +213,9 @@ def train_net(net,
                             'epoch': epoch,
                             'conf_mat' : wandb.Image(plt),
                             'predictions': wb_mask(images[0][:3].cpu(),
-                                                   torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy(),
-                                                   torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy(),
-                                                   class_labels
+                                                   set_bbk_colors(torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy()),
+                                                   set_bbk_colors(torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy()),
+                                                   set_classlabels(class_labels)
                                                    ),
                             **histograms
                         })
