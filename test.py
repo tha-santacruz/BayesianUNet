@@ -20,7 +20,7 @@ if __name__ == "__main__":
     logging.info(f'Using device {device}')
 
     # define test set
-    test_set = BBKDataset(zone = ("genf",), split = "test", buildings = True, vegetation = True, random_seed = 1)
+    test_set = BBKDataset(zone = ("alles",), split = "test", buildings = True, vegetation = True, random_seed = 1)
     test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
 
     # define model
@@ -37,9 +37,9 @@ if __name__ == "__main__":
     print('overall dice score : {}'.format(dice_score))
     print('overall accuracy : {}'.format(accuracy))
     print('overall IOU : {}'.format(iou))
-    print('per class F1 score : {}'.format(F1_class))
-    print('per class accuracy : {}'.format(accuracy_class))
-    print('per class IOU : {}'.format(iou_class))
+    print('per class F1 score : {}'.format(F1_class.cpu().tolist()))
+    print('per class accuracy : {}'.format(accuracy_class.cpu().tolist()))
+    print('per class IOU : {}'.format(iou_class.cpu().tolist()))
 
     # plt.figure()
     # sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.2%', cmap='Blues', cbar=True, xticklabels=test_set.BBK_CLASSES_list,yticklabels=test_set.BBK_CLASSES_list)

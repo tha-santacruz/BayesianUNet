@@ -220,8 +220,6 @@ def train_net(net,
                         '''
                         columns_table= list(class_labels.values())
                         data_table = [accuracy_per_class, F1_score, IOU_score_per_class]
-
-                        logging.info(data_table)
                         score_table = wandb.Table(data = data_table, columns=columns_table)
                         #Add a column for scores names
                         score_table.add_column(name='score',data=list(scores.keys()))
