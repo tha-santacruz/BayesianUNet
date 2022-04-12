@@ -96,7 +96,8 @@ def train_net(net,
     def wb_mask(bg_img, pred_mask, true_mask, labels):
         return wandb.Image(bg_img, masks={
             "prediction" : {"mask_data" : pred_mask, "class_labels" : labels},
-            "ground truth" : {"mask_data" : true_mask, "class_labels" : labels}})
+            "ground truth" : {"mask_data" : true_mask, "class_labels" : labels}}
+            )
 
     #utils to set the colors on the interactive masks on wandb
     #TODO: deplace this block in utils 
@@ -197,11 +198,12 @@ def train_net(net,
                                         8 : "buildings"}
                         scores = {
                                 'Accuracy': accuracy_per_class,
-                                'F1 score' : F1_score
+                                'F1 score' : F1_score,
+                                'IOU': IOU_score_per_class
                                 }
                         
                         columns_table= list(class_labels.values())
-                        data_table = [accuracy_per_class, F1_score]
+                        data_table = [accuracy_per_class, F1_score, IOU_score_per_class]
                         score_table = wandb.Table(data = data_table, columns=columns_table)
 
                         #try to denormalize correctly
@@ -211,9 +213,10 @@ def train_net(net,
 
                         #insert these metrics and objects in wandb
                         experiment.log({
-                            'learning rate': optimizer.param_groups[0]['lr'],
-                            'validation Dice': val_score,
+                            'Learning rate': optimizer.param_groups[0]['lr'],
+                            'Validation Dice score': val_score,
                             'Global accuracy score': accuracy_score,
+                            'IOU score': IOU_score,
                             'Metric per class':score_table, 
                             'images': wandb.Image(images[0][:3].cpu()
                                                     ),
