@@ -24,12 +24,13 @@ if __name__ == "__main__":
     test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
 
     # define model
-    net = UNet(n_channels=7, n_classes=9, bilinear=False)
+    net = UNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
     # net = BayesianUNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
 
     # load pretrained model parameters
-    net.load_state_dict(torch.load('checkpoints/checkpoint_epoch50.pth', map_location=device))
-    logging.info(f'Model loaded from checkpoints/checkpoint_epoch50.pth')
+    checkpoint_path = 'checkpoints/checkpoint_epoch50.pth'
+    net.load_state_dict(torch.load(checkpoint_path, map_location=device))
+    logging.info(f'Model loaded from {checkpoint_path}')
 
     # evaluate test set using pretrained model
     dice_score, accuracy, accuracy_class, F1_class, iou, iou_class, cf_matrix = evaluate(net,test_dl,device)
@@ -40,8 +41,8 @@ if __name__ == "__main__":
     print('per class accuracy : {}'.format(accuracy_class))
     print('per class IOU : {}'.format(iou_class))
 
-    plt.figure()
-    sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.2%', cmap='Blues', cbar=True, xticklabels=test_set.BBK_CLASSES_list,yticklabels=test_set.BBK_CLASSES_list)
-    plt.xticks(rotation=45)
-    plt.yticks(rotation=45)
-    plt.tight_layout()
+    # plt.figure()
+    # sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.2%', cmap='Blues', cbar=True, xticklabels=test_set.BBK_CLASSES_list,yticklabels=test_set.BBK_CLASSES_list)
+    # plt.xticks(rotation=45)
+    # plt.yticks(rotation=45)
+    # plt.tight_layout()
