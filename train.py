@@ -177,7 +177,7 @@ def train_net(net,
                         columns_table= list(class_labels.values())
                         data_table = [accuracy_per_class, F1_score]
                         score_table = wandb.Table(data = data_table, columns=columns_table)
-
+                        wandb_image = images[0][:5,:,:]*train_set.std_vals_tiles+train_set.mean_vals_tiles[:3,0,0]
 
                         experiment.log({
                             'learning rate': optimizer.param_groups[0]['lr'],
@@ -193,7 +193,7 @@ def train_net(net,
                             'step': global_step,
                             'epoch': epoch,
                             'conf_mat' : wandb.Image(plt),
-                            'predictions': wb_mask(images[0][:3].cpu(),
+                            'predictions': wb_mask(wandb_image.cpu(),
                                                    torch.softmax(masks_pred, dim=1).argmax(dim=1)[0].cpu().numpy(),
                                                    torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy(),
                                                    class_labels
