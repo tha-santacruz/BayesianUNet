@@ -206,7 +206,6 @@ def train_net(net,
 
                         '''
                         #TODO: refactor this part   
-                        
                         # Insert the score
                         columns_table= list(class_labels.values()).insert(0,'Score')
                            def score_table_name(score_name, score):
@@ -224,7 +223,10 @@ def train_net(net,
 
                         logging.info(data_table)
                         score_table = wandb.Table(data = data_table, columns=columns_table)
-
+                        #Add a column for scores names
+                        score_table.add_column(name='score',data=list(scores.keys()))
+                        
+                        
                         #try to denormalize correctly
                         #wandb_image = images[0].cpu()
                         #wandb_image = wandb_image[:5,:,:]*train_set.std_vals_tiles+train_set.mean_vals_tiles
