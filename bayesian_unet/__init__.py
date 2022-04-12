@@ -1,1 +1,1 @@
-from .bayesian_unet_model import UNet
+from .bayesian_unet_model import BayesianUNet

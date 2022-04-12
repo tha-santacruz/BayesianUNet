@@ -13,9 +13,15 @@ def evaluate(net, dataloader, device):
 
     #Initialization
     dice_score = 0
+
     accuracy_score = 0
     accuracy_per_class = 0
+
     F1_coeff_per_class  = 0
+
+    IOU_coeff = 0 
+    IOU_coeff_per_class = 0
+    
     cf_matrix = np.zeros(shape = (net.n_classes,net.n_classes))
 
     # iterate over the validation set
@@ -45,14 +51,16 @@ def evaluate(net, dataloader, device):
 
                 #compute the accuracy
                 accuracy_score += metrics.accuracy_coeff(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
-                #compute accuracy per class
                 accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
                 #compute F1 score
                 F1_coeff_per_class += metrics.F1_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-
+                #compute IOU score 
+                IOU_coeff += metrics.IOU_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+                IOU_coeff_per_class += metrics.IOU_score_per_class(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+               
                 #transform prediction in one-hot to compute dice score (ignoring background for dice score)
                 mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
-                # compute the Dice score, 
+                # compute the Dice score per class 
                 dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
 
     cf_matrix = cf_matrix/cf_matrix.sum(axis=1,keepdims=True)
@@ -63,4 +71,4 @@ def evaluate(net, dataloader, device):
     if num_val_batches == 0:
         return dice_score, accuracy_score, accuracy_per_class
 
-    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches, F1_coeff_per_class/ num_val_batches, cf_matrix
+    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches, F1_coeff_per_class/ num_val_batches, IOU_coeff/num_val_batches, IOU_coeff_per_class/num_val_batches,  cf_matrix

@@ -8,7 +8,7 @@ import torch.nn.functional as F
 class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""
 
-    def __init__(self, in_channels, out_channels, mid_channels=None):
+    def __init__(self, in_channels, out_channels, mid_channels=None, drop_channels=True):
         super().__init__()
         if not mid_channels:
             mid_channels = out_channels
@@ -20,6 +20,8 @@ class DoubleConv(nn.Module):
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True)
         )
+        if drop_channels:
+            self.double_conv.append(nn.Dropout2d(p=0.5, inplace=True))
 
     def forward(self, x):
         return self.double_conv(x)

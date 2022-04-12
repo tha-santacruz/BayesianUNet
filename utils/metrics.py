@@ -82,3 +82,16 @@ def F1_score(preds, target, num_classes):
                         )
 
 
+
+def IOU_score(preds, target, num_classes):
+
+    return torchmetrics.functional.jaccard_index(preds,
+                                                target,
+                                                num_classes = num_classes,
+                                                reduction='elementwise_mean')
+def IOU_score_per_class(preds, target, num_classes):
+
+    return torchmetrics.functional.jaccard_index(preds,
+                                                target,
+                                                num_classes = num_classes,
+                                                reduction='none')

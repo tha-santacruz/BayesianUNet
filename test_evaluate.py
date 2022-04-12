@@ -11,6 +11,6 @@ x = next(iter(dl))
 print(x[0][0].size())
 print(x[1][0].type())
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False)
-
+net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
+print(net)
 evaluate(net,dl,device)
