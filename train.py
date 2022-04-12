@@ -16,6 +16,7 @@ from utils.dataset import BBKDataset
 from utils.metrics import dice_loss
 from evaluate import evaluate
 from unet import UNet
+from bayesian_unet import BayesianUNet
 
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
@@ -185,6 +186,7 @@ def train_net(net,
                         sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.2%', cmap='Blues', cbar=True, xticklabels=val_set.BBK_CLASSES_list,yticklabels=val_set.BBK_CLASSES_list)
                         plt.xticks(rotation=45)
                         plt.yticks(rotation=45)
+                        plt.tight_layout()
 
 
                         class_labels = {0 : "null",
@@ -276,6 +278,7 @@ if __name__ == '__main__':
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
+    # net = BayesianUNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
 
     # Choose optimizer
     optims = {"Adam" : optim.Adam, "SGD" : optim.SGD, "RMS" : optim.RMSprop}
