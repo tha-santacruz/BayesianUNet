@@ -156,7 +156,7 @@ def train_net(net,
 
                         # create confusion matrix object
                         plt.figure()
-                        sns.heatmap(cf_matrix, annot=True, fmt='.2%', cmap='Blues', cbar=True, xticklabels=val_set.BBK_CLASSES_list,yticklabels=val_set.BBK_CLASSES_list)
+                        sns.heatmap(cf_matrix, annot=True, fmt='.1%', cmap='Blues', cbar=True, xticklabels=val_set.BBK_CLASSES_list,yticklabels=val_set.BBK_CLASSES_list)
 
                         class_labels = {0 : "null",
                                         1 : "wooded_area",
