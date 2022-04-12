@@ -203,6 +203,20 @@ def train_net(net,
                                 'F1 score' : F1_score,
                                 'IOU': IOU_score_per_class
                                 }
+
+                        '''
+                        #TODO: refactor this part   
+                        data_table = []
+                        for score_name, score in scores.items():
+                            row = [score_name]
+                            for score_unit in score:
+                                row.append(score_unit)
+                            data_table.append(row)
+                        
+                        # Insert the score
+                        columns_table= list(class_labels.values()).insert(0,'Score')
+                        #data_table = [['Accuracy'].append(torch.round(accuracy_per_class,decimals=3).tolist()), ['F1 score'].append(torch.round(F1_score,decimals=3))]
+                        '''
                         
                         columns_table= list(class_labels.values())
                         data_table = [accuracy_per_class, F1_score, IOU_score_per_class]
