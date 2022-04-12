@@ -126,7 +126,7 @@ class BBKDataset:
         if split == "train":
             self.split_coordinates = self.coordinates[:self.split_counts[0]]
         elif split == "test":
-            self.split_coordinates = self.coordinates[self.split_counts[0]:self.split_counts[1]]
+            self.split_coordinates = self.coordinates[self.split_counts[0]:self.split_counts[0]+self.split_counts[1]]
         elif split == "val":
             self.split_coordinates = self.coordinates[self.split_counts[0]+self.split_counts[1]:]
         elif split =="all":

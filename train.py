@@ -163,10 +163,10 @@ def train_net(net,
                 if division_step > 0:
                     if global_step % division_step == 0:
                         histograms = {}
-                        for tag, value in net.named_parameters():
-                            tag = tag.replace('/', '.')
-                            histograms['Weights/' + tag] = wandb.Histogram(value.data.cpu())
-                            histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
+                        # for tag, value in net.named_parameters():
+                        #     tag = tag.replace('/', '.')
+                        #     histograms['Weights/' + tag] = wandb.Histogram(value.data.cpu())
+                        #     histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
 
                         
                         val_score, accuracy_score, accuracy_per_class, F1_score, IOU_score, IOU_score_per_class, cf_matrix = evaluate(net, val_loader, device)
@@ -206,20 +206,23 @@ def train_net(net,
 
                         '''
                         #TODO: refactor this part   
-                        data_table = []
-                        for score_name, score in scores.items():
-                            row = [score_name]
-                            for score_unit in score:
-                                row.append(score_unit)
-                            data_table.append(row)
                         
                         # Insert the score
                         columns_table= list(class_labels.values()).insert(0,'Score')
-                        #data_table = [['Accuracy'].append(torch.round(accuracy_per_class,decimals=3).tolist()), ['F1 score'].append(torch.round(F1_score,decimals=3))]
+                           def score_table_name(score_name, score):
+                            score_list = torch.round(score,decimals=3).tolist()
+                            score_str = [str(scr) for scr in score_list]
+                            score_str.insert(0,score_name)
+                            return score_str
+
+                        data_table = [score_table_name('score',accuracy_per_class), score_table_name('score',F1_score), score_table_name('score',IOU_score_per_class)]
+                        columns_table= list(class_labels.values()).insert(0,'Score')
+
                         '''
-                        
                         columns_table= list(class_labels.values())
                         data_table = [accuracy_per_class, F1_score, IOU_score_per_class]
+
+                        logging.info(data_table)
                         score_table = wandb.Table(data = data_table, columns=columns_table)
 
                         #try to denormalize correctly
@@ -248,7 +251,7 @@ def train_net(net,
                                                    set_bbk_colors(torch.softmax(true_masks, dim=1).argmax(dim=1)[0].cpu().numpy()),
                                                    set_classlabels(class_labels)
                                                    ),
-                            **histograms
+                            #**histograms
                         })
                         plt.close()
 
