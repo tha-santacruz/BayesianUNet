@@ -168,7 +168,6 @@ def train_net(net,
                         #     histograms['Weights/' + tag] = wandb.Histogram(value.data.cpu())
                         #     histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
 
-                        
                         val_score, accuracy_score, accuracy_per_class, F1_score, IOU_score, IOU_score_per_class, cf_matrix = evaluate(net, val_loader, device)
                         
                         #Update the scheduler
@@ -179,6 +178,7 @@ def train_net(net,
                         #logging.info('F1 score : {}'.format(F1_score))
                         
                         logging.info('Validation Dice score: {}'.format(val_score))
+
                         logging.info('IOU score: {}'.format(IOU_score))
 
                         # create wandb objects for visualisation
@@ -187,7 +187,6 @@ def train_net(net,
                         plt.xticks(rotation=45)
                         plt.yticks(rotation=45)
                         plt.tight_layout()
-
 
                         class_labels = {0 : "null",
                                         1 : "wooded_area",
@@ -226,6 +225,7 @@ def train_net(net,
                         
                         
                         #try to denormalize correctly
+                        #TODO : to be removed or note ? 
                         #wandb_image = images[0].cpu()
                         #wandb_image = wandb_image[:5,:,:]*train_set.std_vals_tiles+train_set.mean_vals_tiles
                         #wandb_image = wandb_image[:3,:,:]
@@ -290,8 +290,8 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = BBKDataset(zone = ("genf",), split = "train", buildings = True, vegetation = True, random_seed = 1)
-    val_set = BBKDataset(zone = ("genf",), split = "val", buildings = True, vegetation = True, random_seed = 1)
+    train_set = BBKDataset(zone = ("alles",), split = "train", buildings = True, vegetation = True, random_seed = 1)
+    val_set = BBKDataset(zone = ("alles",), split = "val", buildings = True, vegetation = True, random_seed = 1)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
