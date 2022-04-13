@@ -21,7 +21,7 @@ class DoubleConv(nn.Module):
             nn.ReLU(inplace=True)
         )
         if drop_channels:
-            self.double_conv.append(nn.Dropout2d(p=0.5, inplace=True))
+            self.double_conv.append(nn.Dropout2d(p=0.1))
 
     def forward(self, x):
         return self.double_conv(x)
