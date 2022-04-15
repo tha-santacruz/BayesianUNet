@@ -138,7 +138,7 @@ for i in dl:
 			#plt.imshow(rgb)
 			plt.imshow(prediction, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1), alpha=1)
 			plt.axis('off')
-			plt.title('prediction')
+			plt.title('Prediction')
 			plt.tight_layout()
 			plt.savefig(f'example_data/example_pred{counter}.png')
 			plt.close()
