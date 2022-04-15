@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-bbkd = BBKDataset(zone = ("genf",),split="all", augment=True)
+bbkd = BBKDataset(zone = ("alles",),split="all", augment=True)
 dl = DataLoader(bbkd, batch_size=64, shuffle=True)
 counts_cumulated = torch.tensor([0,0,0,0,0,0,0,0,0])
 for x in tqdm(dl):

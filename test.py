@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # net = BayesianUNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
 
     # load pretrained model parameters
-    checkpoint_path = 'checkpoints/checkpoint_epoch50.pth'
+    checkpoint_path = 'checkpoints_final_model/checkpoint_epoch28.pth'
     net.load_state_dict(torch.load(checkpoint_path, map_location=device))
     logging.info(f'Model loaded from {checkpoint_path}')
 
