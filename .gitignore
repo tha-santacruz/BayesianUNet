@@ -4,3 +4,4 @@ __pycache__
 checkpoints
 wandb
 INTERRUPTED.pth
+checkpoints_final_model
