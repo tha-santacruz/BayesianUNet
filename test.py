@@ -41,14 +41,14 @@ if __name__ == "__main__":
 
     # define test set
     test_set = BBKDataset(zone = ("alles",), split = "test", buildings = True, vegetation = True, random_seed = 1)
-    test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
+    test_dl = DataLoader(test_set, batch_size=16, shuffle=True)
 
     # define model
     net = UNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
     # net = BayesianUNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
 
     # load pretrained model parameters
-    checkpoint_path = 'checkpoints_final_model/checkpoint_epoch28.pth'
+    checkpoint_path = 'checkpoints_final_model/checkpoint_epoch25.pth'
     net.load_state_dict(torch.load(checkpoint_path, map_location=device))
     logging.info(f'Model loaded from {checkpoint_path}')
 
