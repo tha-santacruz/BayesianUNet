@@ -24,7 +24,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 
-dir_checkpoint = Path('./checkpoints/')
+dir_checkpoint = Path('./checkpoints_final_model_b32/')
 
 def train_net(net,
               train_set, 
@@ -291,8 +291,8 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = BBKDataset(zone = ("alles",), split = "train", buildings = True, vegetation = True, random_seed = 1, augment=args.augment)
-    val_set = BBKDataset(zone = ("alles",), split = "val", buildings = True, vegetation = True, random_seed = 1, augment=args.augment)
+    train_set = BBKDataset(zone = ("alles",), split = "train", buildings = True, vegetation = True, random_seed = 1, augment=True)
+    val_set = BBKDataset(zone = ("alles",), split = "val", buildings = True, vegetation = True, random_seed = 1, augment=True)
 
     # Change here to adapt to your data
     net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
