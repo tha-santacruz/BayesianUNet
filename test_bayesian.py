@@ -90,7 +90,7 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         print(f"mean size {batch_mean.size()}")
         batch_pred_entropy = -torch.sum(batch_mean*batch_mean.log(),dim=1)
         print(f"entropy size {batch_pred_entropy.size()}")
-        batch_mutual_info = batch_pred_entropy+torch.mean(torch.sum(dropout_predictions*dropout_predictions.log(),dim=-3))
+        batch_mutual_info = batch_pred_entropy+torch.mean(torch.sum(dropout_predictions*dropout_predictions.log(),dim=-3),dim=0)
         print(f"mutual info size {batch_mutual_info.size()}")
 
         #print(batch_pred_entropy.mean())
