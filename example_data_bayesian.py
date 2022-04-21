@@ -76,7 +76,7 @@ for i in dl:
 			batch_mean = dropout_predictions.mean(dim=0)
 			batch_std = dropout_predictions.std(dim=0)
 			batch_pred_entropy = -torch.sum(batch_mean*batch_mean.log(),dim=1)
-			batch_mutual_info = batch_pred_entropy+torch.mean(torch.sum(dropout_predictions*dropout_predictions.log(),dim=-3))
+			batch_mutual_info = batch_pred_entropy-torch.mean(torch.sum(dropout_predictions*dropout_predictions.log(),dim=-3))
 			entropy = batch_pred_entropy[j].cpu().numpy()
 			mutual = batch_mutual_info[j].cpu().numpy()
 			prediction = batch_mean[j].argmax(dim=0).cpu().numpy()
