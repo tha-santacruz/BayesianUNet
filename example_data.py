@@ -20,6 +20,7 @@ x = next(iter(dl))
 net = UNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
 checkpoint_path = 'checkpoints_final_model/checkpoint_epoch27.pth'
 net.load_state_dict(torch.load(checkpoint_path, map_location=device))
+net.eval()
 
 num = 1
 
@@ -106,7 +107,8 @@ for i in dl:
 		if torch.unique(bbk[bbk!=0], return_counts=False).size(0) == 8:
 			doc = i[0].clone().detach().to(device=device)
 			print(doc.size())
-			prediction = net(doc)[j]
+			with torch.no_grad():
+				prediction = net(doc)[j]
 			prediction = torch.softmax(prediction, dim=0).argmax(dim=0).cpu().numpy()
 			print(np.shape(prediction))
 			print(np.unique(prediction))

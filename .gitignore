@@ -5,3 +5,4 @@ checkpoints
 wandb
 INTERRUPTED.pth
 checkpoints_final_model
+checkpoints_final_model_b32
