@@ -25,7 +25,7 @@ x = next(iter(dl))
 
 # load model
 net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-checkpoint_path = 'checkpoints/checkpoint_epoch80.pth'
+checkpoint_path = 'checkpoints_augmented/checkpoint_epoch60.pth'
 net.load_state_dict(torch.load(checkpoint_path, map_location=device))
 net.eval()
 enable_dropout(net)
