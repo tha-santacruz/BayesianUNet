@@ -223,13 +223,6 @@ def train_net(net,
                         #Add a column for scores names
                         score_table.add_column(name='score',data=list(scores.keys()))
                         
-                        
-                        #try to denormalize correctly
-                        #TODO : to be removed or note ? 
-                        #wandb_image = images[0].cpu()
-                        #wandb_image = wandb_image[:5,:,:]*train_set.std_vals_tiles+train_set.mean_vals_tiles
-                        #wandb_image = wandb_image[:3,:,:]
-
                         #insert these metrics and objects in wandb
                         experiment.log({
                             'Learning rate': optimizer.param_groups[0]['lr'],
