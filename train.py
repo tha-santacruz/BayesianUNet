@@ -24,7 +24,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 
-dir_checkpoint = Path('./checkpoints/')
+dir_checkpoint = Path('./checkpoints_augmented/')
 
 def train_net(net,
               train_set, 
