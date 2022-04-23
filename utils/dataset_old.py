@@ -5,6 +5,7 @@ from os.path import exists
 import torch
 from torch import nn
 from torch.nn import functional as F
+from torchvision import transforms
 from tqdm import tqdm
 import random
 import albumentations as A
@@ -125,7 +126,7 @@ class BBKDataset:
         if split == "train":
             self.split_coordinates = self.coordinates[:self.split_counts[0]]
         elif split == "test":
-            self.split_coordinates = self.coordinates[self.split_counts[0]:self.split_counts[1]]
+            self.split_coordinates = self.coordinates[self.split_counts[0]:self.split_counts[0]+self.split_counts[1]]
         elif split == "val":
             self.split_coordinates = self.coordinates[self.split_counts[0]+self.split_counts[1]:]
         elif split =="all":
@@ -134,6 +135,10 @@ class BBKDataset:
             raise ValueError("Invalid split : values can be 'train', 'test', 'val' or 'all'")
         self.split = split
         self.augment = augment
+
+        # Define transforms for augmentation of rgb channels
+        # TODO : implement
+        #self.jit_transform = transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)
         
     def __len__(self):
         """returns length of valid tiles set"""
@@ -167,6 +172,9 @@ class BBKDataset:
             else:
                 # Standardize using mean and std values
                 if self.folders[f] == "tile_50m/":
+                    # TODO : implement
+                    # if self.augment:
+                    #     image[:3,:,:] = self.jit_transform(image[:3,:,:])
                     image = (image-self.mean_vals_tiles).div(self.std_vals_tiles)
                 elif self.folders[f] == "hoe_50m/":
                     image = (image-self.mean_vals_vegetation).div(self.std_vals_vegetation)
