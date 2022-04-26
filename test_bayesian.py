@@ -21,18 +21,17 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
     enable_dropout(net)
     num_val_batches = len(dataloader)
 
-    #Initialization
+    #Initialization of scores
     dice_score = 0
-
     accuracy_score = 0
     accuracy_per_class = 0
-
     F1_coeff_per_class  = 0
-
     IOU_coeff = 0 
     IOU_coeff_per_class = 0
-    
     cf_matrix = np.zeros(shape = (net.n_classes,net.n_classes))
+    pa = 0
+    pu = 0
+    pavpu = 0
 
     # iterate over the validation set
     for batch in tqdm(dataloader, total=num_val_batches, desc='Validation round', unit='batch', leave=False):
@@ -63,13 +62,13 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         #     print("same result")
         batch_mean = dropout_predictions.mean(dim=0)
         batch_std = dropout_predictions.std(dim=0)
-        print(batch_std.unique())
+        #print(batch_std.unique())
 
-        print(f"mean size {batch_mean.size()}")
+        #print(f"mean size {batch_mean.size()}")
         batch_pred_entropy = -torch.sum(batch_mean*batch_mean.log(),dim=1)
-        print(f"entropy size {batch_pred_entropy.size()}")
+        #print(f"entropy size {batch_pred_entropy.size()}")
         batch_mutual_info = batch_pred_entropy+torch.mean(torch.sum(dropout_predictions*dropout_predictions.log(),dim=-3),dim=0)
-        print(f"mutual info size {batch_mutual_info.size()}")
+        #print(f"mutual info size {batch_mutual_info.size()}")
 
         #print(batch_pred_entropy.mean())
         #print(batch_pred_entropy.mean(dim=(-2,-1)).size())
@@ -98,10 +97,9 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         # hyperparameteters
         w_size = 4 #patch size
         accuracy_tresh = 0.5
-        uncertainity_tresh = 0.4
-
+        
         #traverse the matrix with a patch 
-        unfold = torch.nn.Unfold(kernel_size=(4, 4),stride = 4) #to have 1 meter block
+        unfold = torch.nn.Unfold(kernel_size=(w_size, w_size),stride = 4) #to have 1 meter block
 
         #compute the accuracy each pach and check if it above the threshold
         masktrue_unfold = unfold(mask_true_labels.unsqueeze(dim=1).to(torch.float32))
@@ -110,21 +108,66 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         #print('masktrue_unfold size: {}'.format(masktrue_unfold.size()))
         accuracy_matrix = torch.eq(pred_unfold, masktrue_unfold).to(torch.float32).mean(dim=1)
         #print('accuracy_matrix size :{}'.format(accuracy_matrix.size()))
-        print('average accuracy : {}'.format(accuracy_matrix.mean()))
+        #print('average accuracy : {}'.format(accuracy_matrix.mean()))
         
-        bool_acc_matrix = 
-        
+
         # compute the mean uncertainty and if it above the threshold
         uncertainty_matrix = unfold(batch_pred_entropy.unsqueeze(dim=1)).mean(dim=1)
         #print('uncertainty_matrix size :{}'.format(uncertainty_matrix.size()))
+
+        bool_acc_matrix = torch.gt(accuracy_matrix, accuracy_tresh).to(torch.float32)
+        print('bool_acc_matrix size: {}'.format(bool_acc_matrix.size()))
         
+        #print('average uncertainty score: {}'.format(uncertainty_matrix.mean()))
+        #print('std uncertainty score: {}'.format(uncertainty_matrix.std()))
+        #print('range uncertainty score: {}'.format(uncertainty_matrix.max()-uncertainty_matrix.min()))
         
+        t = 0.4
+        uncertainty_tresh = uncertainty_matrix.min()+t*(uncertainty_matrix.max()-uncertainty_matrix.min())
+
+        bool_uncert_matrix = torch.gt(uncertainty_matrix, uncertainty_tresh).to(torch.float32)
+        #print('bool_acc_matrix size: {}'.format(bool_uncert_matrix.size()))
+
+        #compute cf matrix for both accuracy and uncertainity
+        # compute confidence matrix
+        
+        #compute the PAVU score
+        nac = (bool_acc_matrix*(1-bool_uncert_matrix)).sum()
+        nac_plus_nic = (1-bool_uncert_matrix).sum()
+        niu = (bool_uncert_matrix*(1-bool_acc_matrix)).sum()
+        nic_plus_niu = (1-bool_acc_matrix).sum()
+
+        pa += nac/nac_plus_nic
+        pu += niu/nic_plus_niu
+        pavpu += (nac+niu) / torch.ones_like(bool_acc_matrix).sum()
+        
+        '''
+        print('pa = {}'.format(pa))
+        print('pu = {}'.format(pu))
+        print('pavpu = {}'.format(pavpu))
+
+        print(torch.mean(bool_acc_matrix))
+        print(torch.mean(bool_uncert_matrix))
+        '''
     cf_matrix = cf_matrix/cf_matrix.sum(axis=1,keepdims=True)
 
     net.train()
 
-    score_div = num_val_batches*nb_forward
-    return dice_score / score_div, accuracy_score/score_div, accuracy_per_class/score_div, F1_coeff_per_class/score_div, IOU_coeff/score_div, IOU_coeff_per_class/score_div,  cf_matrix
+    print('pa = {}'.format(pa/num_val_batches))
+    print('pu = {}'.format(pu/num_val_batches))
+    print('pavpu = {}'.format(pavpu/num_val_batches))
+
+
+    return (dice_score / num_val_batches,
+            accuracy_score/num_val_batches,
+            accuracy_per_class/num_val_batches,
+            F1_coeff_per_class/num_val_batches,
+            IOU_coeff/num_val_batches,
+            IOU_coeff_per_class/num_val_batches,
+            cf_matrix,
+            pa/num_val_batches,
+            pu/num_val_batches,
+            pavpu/num_val_batches)
 
 
 def enable_dropout(model):
@@ -156,7 +199,16 @@ if __name__ == '__main__':
     net.eval()
 
     # evaluate test set using pretrained model
-    val_score, accuracy_score, accuracy_per_class, F1_score, IOU_score, IOU_score_per_class, cf_matrix = evaluate_uncertainty(net,test_dl,device, nb_forward=10)
+    (val_score,
+    accuracy_score,
+    accuracy_per_class,
+    F1_score,
+    IOU_score,
+    IOU_score_per_class,
+    cf_matrix,
+    pa,
+    pu,
+    pavpu) = evaluate_uncertainty(net,test_dl,device, nb_forward=10)
     
     # create wandb objects for visualisation
     plt.figure()
@@ -190,6 +242,7 @@ if __name__ == '__main__':
                 'Validation Dice score': val_score,
                 'Global accuracy score': accuracy_score,
                 'IOU score': IOU_score,
+                'PAvPU score':pavpu,
                 'Metric per class':score_table, 
                 'conf_mat' : wandb.Image(plt),
                 #**histograms
