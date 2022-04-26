@@ -69,18 +69,17 @@ def evaluate_uncertainty(net,
         #Compute uncertainty indicateurs
         batch_mean = dropout_predictions.mean(dim=0)
         batch_std = dropout_predictions.std(dim=0)
-        
         batch_pred_entropy = -torch.sum(batch_mean*batch_mean.log(),dim=1)
         batch_mutual_info = batch_pred_entropy+torch.mean(torch.sum(dropout_predictions*dropout_predictions.log(),dim=-3),dim=0)
-        
         #print(f"mean size {batch_mean.size()}")
         #print(f"entropy size {batch_pred_entropy.size()}")
         #print(f"mutual info size {batch_mutual_info.size()}")
 
-        #transform predictions to float labels for others metrics
-        mask_pred = batch_mean
-        mask_pred_labels = mask_pred.argmax(dim=1) 
+
+        #Transform predictions to float labels for others metrics
+        mask_pred_labels = batch_mean.argmax(dim=1) 
         mask_true_labels = mask_true.argmax(dim=1)
+
 
         #compute the accuracy
         accuracy_score += metrics.accuracy_coeff(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
@@ -90,11 +89,12 @@ def evaluate_uncertainty(net,
         #compute IOU score 
         IOU_coeff += metrics.IOU_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
         IOU_coeff_per_class += metrics.IOU_score_per_class(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-
         #transform prediction in one-hot to compute dice score (ignoring background for dice score)
-        mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
+        mask_pred_onehot = F.one_hot(mask_pred_labels, net.n_classes).permute(0,3,1,2).float()
         # compute the Dice score per class 
-        dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
+        dice_score += metrics.multiclass_dice_coeff(mask_pred_onehot[:, 1:, ...],
+                                                    mask_pred_onehot[:, 1:, ...],
+                                                    reduce_batch_first=False)
 
 
         #Produce PAVPU score
@@ -136,7 +136,6 @@ def evaluate_uncertainty(net,
         pu += niu/nic_plus_niu
         pavpu += (nac+niu) / torch.ones_like(bool_acc_matrix).sum()
         
-        
         #print('pa = {}'.format(pa))
         #print('pu = {}'.format(pu))
         #print('pavpu = {}'.format(pavpu))
@@ -146,15 +145,9 @@ def evaluate_uncertainty(net,
     #Compute the global confusion matrix    
     cf_matrix = cf_matrix/cf_matrix.sum(axis=1,keepdims=True)
 
-    
-
-    print('pa = {}'.format(pa/num_val_batches))
-    print('pu = {}'.format(pu/num_val_batches))
-    print('pavpu = {}'.format(pavpu/num_val_batches))
-
     #Re-turn the model in train mode
     net.train()
-    return (dice_score / num_val_batches,
+    return (dice_score/num_val_batches,
             accuracy_score/num_val_batches,
             accuracy_per_class/num_val_batches,
             F1_coeff_per_class/num_val_batches,
@@ -185,7 +178,7 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # define test set
-    test_set = BBKDataset(zone = ("alls",), split = "test", buildings = True, vegetation = True, random_seed = 1)
+    test_set = BBKDataset(zone = ("genf",), split = "test", buildings = True, vegetation = True, random_seed = 1)
     test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
 
     # declare model
