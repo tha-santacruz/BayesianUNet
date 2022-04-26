@@ -4,7 +4,7 @@ from evaluate import evaluate
 from utils.dataset import BBKDataset
 from torch.utils.data import DataLoader
 from unet import UNet
-# from bayesian_unet import BayesianUNet
+from bayesian_unet import BayesianUNet
 from evaluate import evaluate
 import seaborn as sns
 import wandb
@@ -44,11 +44,11 @@ if __name__ == "__main__":
     test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
 
     # define model
-    net = UNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-    # net = BayesianUNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
+    net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
+    # net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
 
     # load pretrained model parameters
-    checkpoint_path = 'checkpoints/checkpoint_epoch80.pth'
+    checkpoint_path = 'checkpoints_bayesian/checkpoint_epoch60.pth'
     net.load_state_dict(torch.load(checkpoint_path, map_location=device))
     logging.info(f'Model loaded from {checkpoint_path}')
 
