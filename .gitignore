@@ -7,3 +7,4 @@ INTERRUPTED.pth
 checkpoints_final_model
 checkpoints_baseline
 checkpoints_augmented
+checkpoints_bayesian

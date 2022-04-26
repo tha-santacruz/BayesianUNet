@@ -119,6 +119,10 @@ def enable_dropout(model):
 
 
 if __name__ == '__main__':
+
+    #wandb initilization
+    experiment = wandb.init(project="Model Testing", entity="bbk_2022", resume='allow', name = datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
     """ Evaluate samples of the test set with uncertainity  values"""
     # set device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -137,3 +141,40 @@ if __name__ == '__main__':
     # evaluate test set using pretrained model
     val_score, accuracy_score, accuracy_per_class, F1_score, IOU_score, IOU_score_per_class, cf_matrix = evaluate_uncertainty(net,test_dl,device, nb_forward=10)
     
+    # create wandb objects for visualisation
+    plt.figure()
+    sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.2%', cmap='Blues', cbar=True, xticklabels=test_set.BBK_CLASSES_list,yticklabels=test_set.BBK_CLASSES_list)
+    plt.xticks(rotation=45)
+    plt.yticks(rotation=45)
+    plt.tight_layout()
+    
+    class_labels = {0 : "null",
+                    1 : "wooded_area",
+                    2 : "water",
+                    3 : "bushes",
+                    4 : "individual_tree",
+                    5 : "no_woodland",
+                    6 : "ruderal_area",
+                    7 : "without_vegetation", 
+                    8 : "buildings"}
+    scores = {
+            'Accuracy': accuracy_per_class,
+            'F1 score' : F1_score,
+            'IOU': IOU_score_per_class
+            }
+    columns_table= list(class_labels.values())
+    data_table = [accuracy_per_class, F1_score, IOU_score_per_class]
+    score_table = wandb.Table(data = data_table, columns=columns_table)
+    #Add a column for scores names
+    score_table.add_column(name='score',data=list(scores.keys()))
+
+
+    experiment.log({
+                'Validation Dice score': val_score,
+                'Global accuracy score': accuracy_score,
+                'IOU score': IOU_score,
+                'Metric per class':score_table, 
+                'conf_mat' : wandb.Image(plt),
+                #**histograms
+            })
+    plt.close()
