@@ -164,7 +164,7 @@ def enable_dropout(model):
     for m in model.modules():
         if m.__class__.__name__.startswith('Dropout'):
             m.train()
-            print("activated dropout")
+            #logging.info("activated dropout")
 
 
 if __name__ == '__main__':
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # define test set
-    test_set = BBKDataset(zone = ("genf",), split = "test", buildings = True, vegetation = True, random_seed = 1)
+    test_set = BBKDataset(zone = ("alles",), split = "test", buildings = True, vegetation = True, random_seed = 1)
     test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
 
     # declare model
