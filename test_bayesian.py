@@ -19,7 +19,7 @@ from sklearn.metrics import confusion_matrix
 def evaluate_uncertainty(net, dataloader, device, nb_forward):
     net.eval()
     enable_dropout(net)
-    num_val_batches = len(dataloader)*nb_forward
+    num_val_batches = len(dataloader)
 
     #Initialization
     dice_score = 0
@@ -39,7 +39,8 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         image, mask_true = batch[0], batch[1]
         # move images and labels to correct device and type
         image = image.to(device=device, dtype=torch.float32)
-        mask_true = mask_true.to(device=device, dtype=torch.float32)
+        mask_true = mask_true.to(#device=device,
+                                 dtype=torch.float32)
 
         # to store n_forward predictions on the same batch
         dropout_predictions = torch.empty((0,mask_true.size(0),mask_true.size(1),mask_true.size(2),mask_true.size(3)))
@@ -55,30 +56,8 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
                 # compute confidence matrix
                 cf_matrix = cf_matrix + confusion_matrix(mask_true.argmax(dim=1).view(-1).cpu(),mask_pred.argmax(dim=1).view(-1).cpu(), labels = np.arange(0,9))
 
-                # convert to one-hot format
-                if net.n_classes == 1:
-                    mask_pred = (F.sigmoid(mask_pred) > 0.5).float()
-                    # compute the Dice score
-                    dice_score += metrics.dice_coeff(mask_pred, mask_true, reduce_batch_first=False)
-                else:
-                    
-                    #transform predictions to float labels for others metrics
-                    mask_pred_labels = mask_pred.argmax(dim=1) 
-                    mask_true_labels = mask_true.argmax(dim=1)
-
-                    #compute the accuracy
-                    accuracy_score += metrics.accuracy_coeff(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
-                    accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
-                    #compute F1 score
-                    F1_coeff_per_class += metrics.F1_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-                    #compute IOU score 
-                    IOU_coeff += metrics.IOU_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-                    IOU_coeff_per_class += metrics.IOU_score_per_class(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-                
-                    #transform prediction in one-hot to compute dice score (ignoring background for dice score)
-                    mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
-                    # compute the Dice score per class 
-                    dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
+        
+        
         #print(dropout_predictions.unique())
         # if torch.eq(dropout_predictions[-1].view(-1),dropout_predictions[-2].view(-1)).all():
         #     print("same result")
@@ -97,17 +76,31 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         #print(batch_pred_entropy.mean(dim=(-2,-1)).size())
         #batch_mutual_info = 
 
+        #transform predictions to float labels for others metrics
+        mask_pred = dropout_predictions[-1]
+        mask_pred_labels = mask_pred.argmax(dim=1) 
+        mask_true_labels = mask_true.argmax(dim=1)
 
+        #compute the accuracy
+        accuracy_score += metrics.accuracy_coeff(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
+        accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
+        #compute F1 score
+        F1_coeff_per_class += metrics.F1_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+        #compute IOU score 
+        IOU_coeff += metrics.IOU_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+        IOU_coeff_per_class += metrics.IOU_score_per_class(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+
+        #transform prediction in one-hot to compute dice score (ignoring background for dice score)
+        mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
+        # compute the Dice score per class 
+        dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
 
     cf_matrix = cf_matrix/cf_matrix.sum(axis=1,keepdims=True)
 
     net.train()
 
-    # Fixes a potential division by zero error
-    if num_val_batches == 0:
-        return dice_score, accuracy_score, accuracy_per_class
-
-    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches, F1_coeff_per_class/ num_val_batches, IOU_coeff/num_val_batches, IOU_coeff_per_class/num_val_batches,  cf_matrix
+    score_div = num_val_batches*nb_forward
+    return dice_score / score_div, accuracy_score/score_div, accuracy_per_class/score_div, F1_coeff_per_class/score_div, IOU_coeff/score_div, IOU_coeff_per_class/score_div,  cf_matrix
 
 
 def enable_dropout(model):
@@ -117,6 +110,31 @@ def enable_dropout(model):
             m.train()
             print("activated dropout")
 
+def compute_scores(mask_pred, mask_true):
+
+    #transform predictions to float labels for others metrics
+    mask_pred_labels = mask_pred.argmax(dim=1) 
+    mask_true_labels = mask_true.argmax(dim=1)
+
+    #compute the accuracy
+    accuracy_score += metrics.accuracy_coeff(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
+    accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
+    #compute F1 score
+    F1_coeff_per_class += metrics.F1_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+    #compute IOU score 
+    IOU_coeff += metrics.IOU_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+    IOU_coeff_per_class += metrics.IOU_score_per_class(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+
+    #transform prediction in one-hot to compute dice score (ignoring background for dice score)
+    mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
+    # compute the Dice score per class 
+    dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
+
+    
+    return []
+
+def compute_uncertainty():
+    return []
 
 if __name__ == '__main__':
 
@@ -129,7 +147,7 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # define test set
-    test_set = BBKDataset(zone = ("goesch",), split = "test", buildings = True, vegetation = True, random_seed = 1)
+    test_set = BBKDataset(zone = ("alles",), split = "test", buildings = True, vegetation = True, random_seed = 1)
     test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
 
     # declare model
@@ -147,7 +165,7 @@ if __name__ == '__main__':
     plt.xticks(rotation=45)
     plt.yticks(rotation=45)
     plt.tight_layout()
-    
+
     class_labels = {0 : "null",
                     1 : "wooded_area",
                     2 : "water",

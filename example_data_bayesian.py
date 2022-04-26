@@ -25,7 +25,7 @@ x = next(iter(dl))
 
 # load model
 net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-checkpoint_path = 'checkpoints_augmented/checkpoint_epoch60.pth'
+checkpoint_path = 'checkpoints_bayesian/checkpoint_epoch60.pth'
 net.load_state_dict(torch.load(checkpoint_path, map_location=device))
 net.eval()
 enable_dropout(net)
@@ -80,6 +80,7 @@ for i in dl:
 			#batch_mutual_info = torch.mean(torch.sum(dropout_predictions*dropout_predictions.log(),dim=-3), dim=0)
 			entropy = batch_pred_entropy[j].cpu().numpy()
 			mutual = batch_mutual_info[j].cpu().numpy()
+			aleatoric = entropy-mutual
 			prediction = batch_mean[j].argmax(dim=0).cpu().numpy()
 			print(np.shape(prediction))
 			print(np.shape(mutual))
@@ -119,6 +120,10 @@ for i in dl:
 			plt.imshow(mutual)
 			plt.axis('off')
 			plt.title('Mutual info')
+			plt.subplot(236)
+			plt.imshow(aleatoric)
+			plt.axis('off')
+			plt.title('Aleatoric')
 			plt.tight_layout()
 			plt.savefig(f'example_data/example_pred_bayesian{counter}.png')
 			plt.close()
