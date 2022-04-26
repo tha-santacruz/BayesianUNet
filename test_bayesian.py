@@ -89,11 +89,12 @@ def evaluate_uncertainty(net,
         #compute IOU score 
         IOU_coeff += metrics.IOU_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
         IOU_coeff_per_class += metrics.IOU_score_per_class(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
+        
         #transform prediction in one-hot to compute dice score (ignoring background for dice score)
         mask_pred_onehot = F.one_hot(mask_pred_labels, net.n_classes).permute(0,3,1,2).float()
         # compute the Dice score per class 
         dice_score += metrics.multiclass_dice_coeff(mask_pred_onehot[:, 1:, ...],
-                                                    mask_pred_onehot[:, 1:, ...],
+                                                    mask_true[:, 1:, ...],
                                                     reduce_batch_first=False)
 
 
