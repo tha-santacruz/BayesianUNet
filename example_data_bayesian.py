@@ -105,8 +105,8 @@ for i in dl:
 			# fold uncertainity and accuracy matrices
 			acc_expanded = bool_acc_matrix.view(bool_acc_matrix.size(0),1,bool_acc_matrix.size(1)).expand(bool_acc_matrix.size(0),w_size**2,bool_acc_matrix.size(1))
 			uncert_expanded = bool_uncert_matrix.view(bool_uncert_matrix.size(0),1,bool_uncert_matrix.size(1)).expand(bool_uncert_matrix.size(0),w_size**2,bool_uncert_matrix.size(1))
-			bin_acc_map = fold(acc_expanded)
-			bin_uncert_map = fold(uncert_expanded)
+			bin_acc_map = fold(acc_expanded)[j][0]
+			bin_uncert_map = fold(uncert_expanded)[j][0]
 			
 			# data visualization
 			bbk = bbk.numpy()
