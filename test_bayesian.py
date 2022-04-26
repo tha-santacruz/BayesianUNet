@@ -64,8 +64,7 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         batch_mean = dropout_predictions.mean(dim=0)
         batch_std = dropout_predictions.std(dim=0)
         print(batch_std.unique())
-        #batch_mean = dropout_predictions.mean(dim=(0,-2,-1))
-        #batch_std = dropout_predictions.std(dim=(0,-2,-1))
+
         print(f"mean size {batch_mean.size()}")
         batch_pred_entropy = -torch.sum(batch_mean*batch_mean.log(),dim=1)
         print(f"entropy size {batch_pred_entropy.size()}")
@@ -74,7 +73,6 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
 
         #print(batch_pred_entropy.mean())
         #print(batch_pred_entropy.mean(dim=(-2,-1)).size())
-        #batch_mutual_info = 
 
         #transform predictions to float labels for others metrics
         mask_pred = batch_mean
@@ -95,6 +93,32 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         # compute the Dice score per class 
         dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
 
+
+        ## produce PAVPU score
+        # hyperparameteters
+        w_size = 4 #patch size
+        accuracy_tresh = 0.5
+        uncertainity_tresh = 0.4
+
+        #traverse the matrix with a patch 
+        unfold = torch.nn.Unfold(kernel_size=(4, 4),stride = 4) #to have 1 meter block
+
+        #compute the accuracy each pach and check if it above the threshold
+        masktrue_unfold = unfold(mask_true_labels.unsqueeze(dim=1).to(torch.float32))
+        pred_unfold = unfold(mask_pred_labels.unsqueeze(dim=1).to(torch.float32))
+        #print('pred_unfold size: {}'.format(pred_unfold.size()))
+        #print('masktrue_unfold size: {}'.format(masktrue_unfold.size()))
+        accuracy_matrix = torch.eq(pred_unfold, masktrue_unfold).to(torch.float32).mean(dim=1)
+        #print('accuracy_matrix size :{}'.format(accuracy_matrix.size()))
+        print('average accuracy : {}'.format(accuracy_matrix.mean()))
+        
+        bool_acc_matrix = 
+        
+        # compute the mean uncertainty and if it above the threshold
+        uncertainty_matrix = unfold(batch_pred_entropy.unsqueeze(dim=1)).mean(dim=1)
+        #print('uncertainty_matrix size :{}'.format(uncertainty_matrix.size()))
+        
+        
     cf_matrix = cf_matrix/cf_matrix.sum(axis=1,keepdims=True)
 
     net.train()
@@ -110,31 +134,6 @@ def enable_dropout(model):
             m.train()
             print("activated dropout")
 
-def compute_scores(mask_pred, mask_true):
-
-    #transform predictions to float labels for others metrics
-    mask_pred_labels = mask_pred.argmax(dim=1) 
-    mask_true_labels = mask_true.argmax(dim=1)
-
-    #compute the accuracy
-    accuracy_score += metrics.accuracy_coeff(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
-    accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
-    #compute F1 score
-    F1_coeff_per_class += metrics.F1_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-    #compute IOU score 
-    IOU_coeff += metrics.IOU_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-    IOU_coeff_per_class += metrics.IOU_score_per_class(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-
-    #transform prediction in one-hot to compute dice score (ignoring background for dice score)
-    mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
-    # compute the Dice score per class 
-    dice_score += metrics.multiclass_dice_coeff(mask_pred[:, 1:, ...], mask_true[:, 1:, ...], reduce_batch_first=False)
-
-    
-    return []
-
-def compute_uncertainty():
-    return []
 
 if __name__ == '__main__':
 
@@ -147,7 +146,7 @@ if __name__ == '__main__':
     logging.info(f'Using device {device}')
 
     # define test set
-    test_set = BBKDataset(zone = ("alles",), split = "test", buildings = True, vegetation = True, random_seed = 1)
+    test_set = BBKDataset(zone = ("genf",), split = "test", buildings = True, vegetation = True, random_seed = 1)
     test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
 
     # declare model
