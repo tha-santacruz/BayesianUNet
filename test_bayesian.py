@@ -77,7 +77,7 @@ def evaluate_uncertainty(net, dataloader, device, nb_forward):
         #batch_mutual_info = 
 
         #transform predictions to float labels for others metrics
-        mask_pred = dropout_predictions[-1]
+        mask_pred = batch_mean
         mask_pred_labels = mask_pred.argmax(dim=1) 
         mask_true_labels = mask_true.argmax(dim=1)
 
@@ -152,7 +152,7 @@ if __name__ == '__main__':
 
     # declare model
     net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-    checkpoint_path = 'checkpoints/checkpoint_epoch80.pth'
+    checkpoint_path = 'checkpoints_bayesian/checkpoint_epoch60.pth'
     net.load_state_dict(torch.load(checkpoint_path, map_location=device))
     net.eval()
 
