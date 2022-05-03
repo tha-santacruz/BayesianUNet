@@ -8,3 +8,4 @@ checkpoints_final_model
 checkpoints_baseline
 checkpoints_augmented
 checkpoints_bayesian
+random_examples

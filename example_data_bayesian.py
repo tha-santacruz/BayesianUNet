@@ -56,7 +56,7 @@ plt.savefig(f'example_data/bbk_legend.png')
 # unfolding and folding
 w_size = 4 #patch size
 accuracy_tresh = 0.5
-t = 0.4
+t = 0.4 # default 0.4
 unfold = torch.nn.Unfold(kernel_size=(w_size, w_size),stride = w_size)
 fold = torch.nn.Fold(output_size=(200,200), kernel_size=(w_size, w_size), stride=w_size)
 
@@ -136,17 +136,15 @@ for i in dl:
 			plt.axis('off')
 			plt.title('Prediction')
 			plt.subplot(334)
-			plt.imshow(entropy)
+			# plt.imshow(entropy)
+			plt.imshow(entropy, vmin=batch_pred_entropy.min().cpu().numpy(), vmax = batch_pred_entropy.max().cpu().numpy())
 			plt.axis('off')
 			plt.title('Entropy')
 			plt.subplot(335)
-			plt.imshow(mutual)
+			# plt.imshow(mutual)
+			plt.imshow(mutual, vmin=batch_mutual_info.min().cpu().numpy(), vmax = batch_mutual_info.max().cpu().numpy())
 			plt.axis('off')
 			plt.title('Epistemic') # equal to mutual information
-			plt.subplot(336)
-			plt.imshow(aleatoric)
-			plt.axis('off')
-			plt.title('Aleatoric')
 			plt.subplot(337)
 			plt.imshow(bin_acc_map)
 			plt.axis('off')
