@@ -20,7 +20,7 @@ def enable_dropout(model):
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # dataset
-bbkd = BBKDataset(zone = ("alles",),split="train", augment=False)
+bbkd = BBKDataset(zone = ("alles",),split="test", augment=False)
 print(len(bbkd))
 dl = DataLoader(bbkd, batch_size=32, shuffle=False)
 x = next(iter(dl))

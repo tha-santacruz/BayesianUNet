@@ -120,6 +120,7 @@ class BBKDataset:
         self.split_counts = [int(len(self.coordinates)*self.SPLIT_SIZE["train"])]
         self.split_counts.append(int(len(self.coordinates)*self.SPLIT_SIZE["test"]))
         random.Random(random_seed).shuffle(self.coordinates)
+        print(self.split_counts)
         # Make split
         if split == "train":
             self.split_coordinates = self.coordinates[:self.split_counts[0]]
@@ -150,7 +151,7 @@ class BBKDataset:
 
     def __getitem__(self, idx):
         """Generates multiband image and label for the coordinates of given indexes"""
-        couple, z = self.coordinates[idx]
+        couple, z = self.split_coordinates[idx]
         doc= torch.empty((0,200,200))
         for f in range(len(self.folders)):
             # Open image
