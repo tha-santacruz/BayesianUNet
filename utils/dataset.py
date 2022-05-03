@@ -120,7 +120,6 @@ class BBKDataset:
         self.split_counts = [int(len(self.coordinates)*self.SPLIT_SIZE["train"])]
         self.split_counts.append(int(len(self.coordinates)*self.SPLIT_SIZE["test"]))
         random.Random(random_seed).shuffle(self.coordinates)
-        print(self.split_counts)
         # Make split
         if split == "train":
             self.split_coordinates = self.coordinates[:self.split_counts[0]]
