@@ -22,8 +22,6 @@ class BBKDataset:
         self.BBK_CLASSES_dict = {0 : "null", 1 : "wooded_area", 2 : "water", 3 : "bushes", 4 : "individual_tree", 
                                  5 : "no_woodland", 6 : "ruderal_area", 7 : "without_vegetation", 8 : "buildings"}
         
-        # Augmentation methods
-        self.rnd_flips = A.Compose([A.HorizontalFlip(p=0.5),A.VerticalFlip(p=0.5)])
 
         # Handle data coverage zone
         self.zone = []
@@ -134,19 +132,29 @@ class BBKDataset:
         else:
             raise ValueError("Invalid split : values can be 'train', 'test', 'val' or 'all'")
         self.split = split
-        self.augment = augment
 
-        # Define transforms for augmentation of rgb channels
-        # TODO : implement
-        #self.jit_transform = transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)
+        # Augmentation methods
+        self.augment = augment
+        # Random flips
+        self.rnd_flips = A.Compose([A.HorizontalFlip(p=0.5),A.VerticalFlip(p=0.5)])
+        # Define transforms for augmentation of rgbir channels
+        # Noise percent
+        percent_noise = 0.5
+        # Noise std for R-G-B-IR-DSM channels
+        self.noise_std = self.std_vals_tiles[:5].squeeze()*percent_noise
+        # Noise std for HOE
+        self.hoe_noise_std = self.std_vals_vegetation.squeeze()*percent_noise
+        # Noise for build
+        self.build_noisy_pixels = 2000
         
+
     def __len__(self):
         """returns length of valid tiles set"""
         return len(self.split_coordinates)
 
     def __getitem__(self, idx):
         """Generates multiband image and label for the coordinates of given indexes"""
-        couple, z = self.coordinates[idx]
+        couple, z = self.split_coordinates[idx]
         doc= torch.empty((0,200,200))
         for f in range(len(self.folders)):
             # Open image
@@ -172,15 +180,25 @@ class BBKDataset:
             else:
                 # Standardize using mean and std values
                 if self.folders[f] == "tile_50m/":
-                    # TODO : implement
-                    # if self.augment:
-                    #     image[:3,:,:] = self.jit_transform(image[:3,:,:])
+                    # Augment if requested
+                    if self.augment:
+                        for channel in range(len(self.noise_std)):
+                            #print(self.noise_std[channel])
+                            image[channel] = image[channel] + torch.normal(mean=0, std=self.noise_std[channel], size=(200,200))
+                            F.relu(image, inplace=True)
                     image = (image-self.mean_vals_tiles).div(self.std_vals_tiles)
                 elif self.folders[f] == "hoe_50m/":
+                    # Augment if requested
+                    if self.augment:
+                        image[0] = image[0] + torch.normal(mean=0, std=self.noise_std[channel], size=(200,200))
                     image = (image-self.mean_vals_vegetation).div(self.std_vals_vegetation)
-                    pass
                 # Remove buildings in the "Null" class zones
                 elif self.folders[f] == "build_50m/":
+                    # Augment if requested
+                    if self.augment:
+                        pixels_x = torch.randint(0, 200, (self.build_noisy_pixels,))
+                        pixels_y = torch.randint(0, 200, (self.build_noisy_pixels,))
+                        image[0,pixels_x,pixels_y] = 1-image[0,pixels_x,pixels_y]
                     image = non_null*image
                 doc = torch.cat((doc, image), dim=0)
                 doc = doc.to(torch.float32)

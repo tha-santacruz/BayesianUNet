@@ -185,7 +185,6 @@ class BBKDataset:
                     image = (image-self.mean_vals_tiles).div(self.std_vals_tiles)
                 elif self.folders[f] == "hoe_50m/":
                     image = (image-self.mean_vals_vegetation).div(self.std_vals_vegetation)
-                    pass
                 # Remove buildings in the "Null" class zones
                 elif self.folders[f] == "build_50m/":
                     image = non_null*image
