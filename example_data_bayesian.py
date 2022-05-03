@@ -64,7 +64,7 @@ counter = 0
 for i in dl:
 	for j in range(len(i[0])):
 		bbk = i[1][j].argmax(dim=0)
-		if torch.unique(bbk[bbk!=0], return_counts=False).size(0) == 8:
+		if torch.unique(bbk[bbk!=0], return_counts=False).size(0) >= 7:
 			doc = i[0].clone().detach().to(device=device)
 			print(doc.size())
 			# to store n_forward predictions on the same batch
@@ -108,8 +108,10 @@ for i in dl:
 			bin_acc_map = fold(acc_expanded)[j][0]
 			bin_uncert_map = fold(uncert_expanded)[j][0]
 
-			# create
-			
+			# create 
+			bin_inacc_certain = (1-bin_acc_map)*(1-bin_uncert_map)
+
+
 			# data visualization
 			bbk = bbk.numpy()
 			counter += 1
@@ -155,9 +157,17 @@ for i in dl:
 			plt.imshow(bin_uncert_map)
 			plt.axis('off')
 			plt.title('Uncertainity (binary)')
+
+			plt.subplot(339)
+			plt.imshow(bin_inacc_certain)
+			plt.axis('off')
+			plt.title('Inaccurate and certain') 
+
 			plt.tight_layout()
 			plt.savefig(f'example_data/example_pred_bayesian{counter}.png')
 			plt.close()
+
+			
 
 			# # prediction image
 			# fig = plt.figure()
@@ -180,35 +190,35 @@ for i in dl:
 			# plt.savefig(f'example_data/example_pred{counter}.png')
 			# plt.close()
 
-			# # data image
-			# fig = plt.figure()
-			# plt.subplot(231)
-			# plt.imshow(rgb)
-			# # plt.imshow(bbk, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1), alpha=0.4)
-			# plt.axis('off')
-			# plt.title('RGB')
-			# plt.subplot(232)
-			# plt.imshow(ir, cmap='Reds', norm=colors.Normalize())
-			# plt.axis('off')
-			# plt.title('IR')
-			# plt.subplot(233)
-			# plt.imshow(dsm, norm=colors.Normalize())
-			# plt.axis('off')
-			# plt.title('DSM')
-			# plt.subplot(234)
-			# plt.imshow(build, cmap='Greys')
-			# plt.axis('off')
-			# plt.title('Build')
-			# plt.subplot(235)
-			# plt.imshow(hoe, cmap='Greens', norm=colors.Normalize())
-			# plt.axis('off')
-			# plt.title('HOE')
-			# plt.subplot(236)
-			# plt.imshow(bbk, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1))
-			# plt.axis('off')
-			# plt.title('BBK')
-			# plt.tight_layout()
-			# plt.savefig(f'example_data/example_data{counter}.png')
-			# plt.close()
+			# data image
+			fig = plt.figure()
+			plt.subplot(231)
+			plt.imshow(rgb)
+			# plt.imshow(bbk, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1), alpha=0.4)
+			plt.axis('off')
+			plt.title('RGB')
+			plt.subplot(232)
+			plt.imshow(ir, cmap='Reds', norm=colors.Normalize())
+			plt.axis('off')
+			plt.title('IR')
+			plt.subplot(233)
+			plt.imshow(dsm, norm=colors.Normalize())
+			plt.axis('off')
+			plt.title('DSM')
+			plt.subplot(234)
+			plt.imshow(build, cmap='Greys')
+			plt.axis('off')
+			plt.title('Build')
+			plt.subplot(235)
+			plt.imshow(hoe, cmap='Greens', norm=colors.Normalize())
+			plt.axis('off')
+			plt.title('HOE')
+			plt.subplot(236)
+			plt.imshow(bbk, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1))
+			plt.axis('off')
+			plt.title('BBK')
+			plt.tight_layout()
+			plt.savefig(f'example_data/example_data{counter}.png')
+			plt.close()
 print(f'number of resulting images : {counter}')
 			
