@@ -107,6 +107,8 @@ for i in dl:
 			uncert_expanded = bool_uncert_matrix.view(bool_uncert_matrix.size(0),1,bool_uncert_matrix.size(1)).expand(bool_uncert_matrix.size(0),w_size**2,bool_uncert_matrix.size(1))
 			bin_acc_map = fold(acc_expanded)[j][0]
 			bin_uncert_map = fold(uncert_expanded)[j][0]
+
+			# create
 			
 			# data visualization
 			bbk = bbk.numpy()
