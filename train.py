@@ -12,7 +12,7 @@ from torch import optim
 from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 
-from utils.dataset_old import BBKDataset
+from utils.dataset import BBKDataset
 from utils.metrics import dice_loss
 from evaluate import evaluate
 from unet import UNet
