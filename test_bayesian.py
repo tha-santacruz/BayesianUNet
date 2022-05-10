@@ -234,6 +234,8 @@ if __name__ == '__main__':
                 'Validation Dice score': val_score,
                 'Global accuracy score': accuracy_score,
                 'IOU score': IOU_score,
+                'PA score':pa,
+                'PU score':pu,
                 'PAvPU score':pavpu,
                 'Metric per class':score_table, 
                 'conf_mat' : wandb.Image(plt),

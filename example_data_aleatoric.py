@@ -8,13 +8,20 @@ import matplotlib.patches as mpatches
 import numpy as np
 from bayesian_unet import BayesianUNet
 
-# dropout activation
+# dropout activation and deactivation
 def enable_dropout(model):
 	""" Function to enable the dropout layers during test-time """
 	for m in model.modules():
 		if m.__class__.__name__.startswith('Dropout'):
 			m.train()
-			print("activated dropout")
+	#print("activated dropout")
+
+def disable_dropout(model):
+	""" Function to enable the dropout layers during test-time """
+	for m in model.modules():
+		if m.__class__.__name__.startswith('Dropout'):
+			m.eval()
+	#print("disabled dropout")
 
 
 # device
@@ -28,10 +35,9 @@ x = next(iter(dl))
 
 # load model
 net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-checkpoint_path = 'checkpoints_bayesian/checkpoint_epoch60.pth'
+checkpoint_path = 'checkpoints_b_augmented/checkpoint_epoch60.pth'
 net.load_state_dict(torch.load(checkpoint_path, map_location=device))
 net.eval()
-enable_dropout(net)
 
 nb_forward = 20
 
@@ -82,14 +88,19 @@ for i in dl:
              	#loop to add the noise
 				for k in range(image_aleatoric.size()[0]):
 					img = image_aleatoric[k,:,:,:].cpu().numpy()
-					add_noise = A.augmentations.transforms.GaussNoise (var_limit=20, mean=0, per_channel=True, always_apply=False, p=1)
+					add_noise = A.augmentations.transforms.GaussNoise (var_limit=10, mean=0, per_channel=True, always_apply=False, p=1)
 					image_aleatoric[k,:,:,:] = torch.tensor(add_noise(image=img)["image"]).to(device=device, dtype=torch.float32)
 
 				with torch.no_grad():
-					# predict
+					# predict with dropout
+					enable_dropout(net)
 					mask_pred = net(doc)
 					# concatenate prediction to the other made on the same batch
 					dropout_predictions = torch.cat((dropout_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
+					# predict noisy image
+					disable_dropout(net)
+					mask_pred = net(image_aleatoric)
+					# concatenate prediction to the other made on the same batch
 					aleatoric_predictions = torch.cat((aleatoric_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
 
 			# compute bayesian metrics
@@ -193,28 +204,6 @@ for i in dl:
 			plt.savefig(f'example_data/example_pred_bayesian{counter}.png')
 			plt.close()
 
-			
-
-			# # prediction image
-			# fig = plt.figure()
-			# plt.subplot(131)
-			# plt.imshow(rgb)
-			# # plt.imshow(bbk, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1), alpha=0.4)
-			# plt.axis('off')
-			# plt.title('RGB')
-			# plt.subplot(132)
-			# #plt.imshow(rgb)
-			# plt.imshow(bbk, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1), alpha=1)
-			# plt.axis('off')
-			# plt.title('BBK')
-			# plt.subplot(133)
-			# #plt.imshow(rgb)
-			# plt.imshow(prediction, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1), alpha=1)
-			# plt.axis('off')
-			# plt.title('Prediction')
-			# plt.tight_layout()
-			# plt.savefig(f'example_data/example_pred{counter}.png')
-			# plt.close()
 
 			# data image
 			fig = plt.figure()
