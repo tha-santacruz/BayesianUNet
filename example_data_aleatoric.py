@@ -88,8 +88,13 @@ for i in dl:
              	#loop to add the noise
 				for k in range(image_aleatoric.size()[0]):
 					img = image_aleatoric[k,:,:,:].cpu().numpy()
-					add_noise = A.augmentations.transforms.GaussNoise (var_limit=10, mean=0, per_channel=True, always_apply=False, p=1)
-					image_aleatoric[k,:,:,:] = torch.tensor(add_noise(image=img)["image"]).to(device=device, dtype=torch.float32)
+					
+					change_brightContrast = A.augmentations.transforms.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=1)
+					change_hueSaturation = A.augmentations.transforms.HueSaturationValue(hue_shift_limit=0.2, sat_shift_limit=0.2, p=1)
+					
+					# Add augmentation changing contrast, saturation and brightness
+					image_temp = change_hueSaturation(image=np.transpose(img[:3,:,:],axes=(1,2,0)))['image']
+					image_aleatoric[k,:3,:,:] = torch.tensor(change_brightContrast(image=np.transpose(image_temp,axes=(2,1,0)))['image']).to(device=device, dtype=torch.float32)
 
 				with torch.no_grad():
 					# predict with dropout

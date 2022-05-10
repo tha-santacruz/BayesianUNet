@@ -75,23 +75,27 @@ def evaluate_uncertainty(net,
              #loop to add the noise
             for k in range(image_aleatoric.size()[0]):
                 img = image_aleatoric[k,:,:,:].cpu().numpy()
-                change_brightContrast = A.augmentations.transforms.RandomBrightnessContrast(p=1)
-                add_noise = A.augmentations.transforms.GaussNoise (var_limit=20, mean=0, per_channel=True, always_apply=False, p=1)
-                image_aleatoric[k,4:7,:,:] = torch.tensor(add_noise(image=img)["image"]).to(device=device, dtype=torch.float32)
-                image_aleatoric[k,:4,:,:] = torch.tensor(add_noise(change_brightContrast(image=img)["image"])).to(device=device, dtype=torch.float32)
+
+                change_brightContrast = A.augmentations.transforms.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=1)
+                change_hueSaturation = A.augmentations.transforms.HueSaturationValue(hue_shift_limit=0.2, sat_shift_limit=0.2, p=1)
+					
+                image_temp = change_hueSaturation(image=np.transpose(img[:3,:,:],axes=(1,2,0)))['image']
+                image_aleatoric[k,:3,:,:] = torch.tensor(change_brightContrast(image=np.transpose(image_temp,axes=(2,1,0)))['image']).to(device=device, dtype=torch.float32)
+            
             with torch.no_grad():
-                # predict with dropout
-                enable_dropout(net)
-                mask_pred = net(doc)
-                # concatenate prediction to the other made on the same batch
-                dropout_predictions = torch.cat((dropout_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
+                
                 # predict noisy image
                 disable_dropout(net)
                 mask_pred = net(image_aleatoric)
-                
                 # concatenate prediction to the other made on the same batch
                 aleatoric_predictions = torch.cat((aleatoric_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
                 
+                # predict with dropout
+                enable_dropout(net)
+                mask_pred = net(image)
+                # concatenate prediction to the other made on the same batch
+                dropout_predictions = torch.cat((dropout_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
+
                 # compute confidence matrix
                 cf_matrix = cf_matrix + confusion_matrix(mask_true.argmax(dim=1).view(-1).cpu(),mask_pred.argmax(dim=1).view(-1).cpu(), labels = np.arange(0,9))
 
@@ -215,7 +219,7 @@ if __name__ == '__main__':
 
     # declare model
     net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-    checkpoint_path = 'checkpoints_bayesian/checkpoint_epoch60.pth'
+    checkpoint_path = 'checkpoints_b_augmented/checkpoint_epoch60.pth'
     net.load_state_dict(torch.load(checkpoint_path, map_location=device))
     net.eval()
 
