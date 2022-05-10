@@ -16,6 +16,20 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 
+# dropout activation and deactivation
+def enable_dropout(model):
+	""" Function to enable the dropout layers during test-time """
+	for m in model.modules():
+		if m.__class__.__name__.startswith('Dropout'):
+			m.train()
+	#print("activated dropout")
+
+def disable_dropout(model):
+	""" Function to enable the dropout layers during test-time """
+	for m in model.modules():
+		if m.__class__.__name__.startswith('Dropout'):
+			m.eval()
+	#print("disabled dropout")
 # Source to compute entropy and mutual information : 
 # https://stackoverflow.com/questions/63285197/measuring-uncertainty-using-mc-dropout-on-pytorch
 def evaluate_uncertainty(net,
@@ -61,15 +75,21 @@ def evaluate_uncertainty(net,
              #loop to add the noise
             for k in range(image_aleatoric.size()[0]):
                 img = image_aleatoric[k,:,:,:].cpu().numpy()
+                change_brightContrast = A.augmentations.transforms.RandomBrightnessContrast(p=1)
                 add_noise = A.augmentations.transforms.GaussNoise (var_limit=20, mean=0, per_channel=True, always_apply=False, p=1)
-                image_aleatoric[k,:,:,:] = torch.tensor(add_noise(image=img)["image"]).to(device=device, dtype=torch.float32)
-
+                image_aleatoric[k,4:7,:,:] = torch.tensor(add_noise(image=img)["image"]).to(device=device, dtype=torch.float32)
+                image_aleatoric[k,:4,:,:] = torch.tensor(add_noise(change_brightContrast(image=img)["image"])).to(device=device, dtype=torch.float32)
             with torch.no_grad():
-                # predict the mask (pytorch tensor have the following structure : [batch_no, class, pixel_x, pixel_y])
-                mask_pred = net(image)
-
+                # predict with dropout
+                enable_dropout(net)
+                mask_pred = net(doc)
                 # concatenate prediction to the other made on the same batch
                 dropout_predictions = torch.cat((dropout_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
+                # predict noisy image
+                disable_dropout(net)
+                mask_pred = net(image_aleatoric)
+                
+                # concatenate prediction to the other made on the same batch
                 aleatoric_predictions = torch.cat((aleatoric_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
                 
                 # compute confidence matrix
@@ -177,13 +197,6 @@ def evaluate_uncertainty(net,
             pu/num_val_batches,
             pavpu/num_val_batches)
 
-
-def enable_dropout(model):
-    """ Function to enable the dropout layers during test-time """
-    for m in model.modules():
-        if m.__class__.__name__.startswith('Dropout'):
-            m.train()
-            #logging.info("activated dropout")
 
 
 if __name__ == '__main__':
