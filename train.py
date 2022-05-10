@@ -12,7 +12,7 @@ from torch import optim
 from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 
-from utils.dataset import BBKDataset
+from utils.dataset_old import BBKDataset
 from utils.metrics import dice_loss
 from evaluate import evaluate
 from unet import UNet
@@ -24,7 +24,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 
-dir_checkpoint = Path('./checkpoints_augmented/')
+dir_checkpoint = Path('./checkpoints_b_augmented/')
 
 def train_net(net,
               train_set, 
@@ -285,7 +285,7 @@ if __name__ == '__main__':
 
     # Create datasets
     train_set = BBKDataset(zone = ("alles",), split = "train", buildings = True, vegetation = True, random_seed = 1, augment=True)
-    val_set = BBKDataset(zone = ("alles",), split = "val", buildings = True, vegetation = True, random_seed = 1, augment=True)
+    val_set = BBKDataset(zone = ("alles",), split = "val", buildings = True, vegetation = True, random_seed = 1, augment=False)
 
     # Change here to adapt to your data
     # net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)

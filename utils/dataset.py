@@ -139,9 +139,14 @@ class BBKDataset:
         self.rnd_flips = A.Compose([A.HorizontalFlip(p=0.5),A.VerticalFlip(p=0.5)])
         # Define transforms for augmentation of rgbir channels
         # Noise percent
-        percent_noise = 0.1
-        # Noise std for R-G-B-IR channels
-        self.noise_std = self.std_vals_tiles[:4].squeeze()*percent_noise
+        percent_noise = 0.2
+        # Noise std for R-G-B-IR-DSM channels
+        self.noise_std = self.std_vals_tiles[:5].squeeze()*percent_noise
+        self.noise_std[4] = self.noise_std[4]*0.1
+        # Noise std for HOE
+        self.hoe_noise_std = self.std_vals_vegetation.squeeze()*percent_noise
+        # Noise for build
+        self.build_noisy_pixels = 2000
         
 
     def __len__(self):
@@ -184,9 +189,17 @@ class BBKDataset:
                             F.relu(image, inplace=True)
                     image = (image-self.mean_vals_tiles).div(self.std_vals_tiles)
                 elif self.folders[f] == "hoe_50m/":
+                    # Augment if requested
+                    if self.augment:
+                        image[0] = image[0] + torch.normal(mean=0, std=self.hoe_noise_std, size=(200,200))
                     image = (image-self.mean_vals_vegetation).div(self.std_vals_vegetation)
                 # Remove buildings in the "Null" class zones
                 elif self.folders[f] == "build_50m/":
+                    # Augment if requested
+                    if self.augment:
+                        pixels_x = torch.randint(0, 200, (self.build_noisy_pixels,))
+                        pixels_y = torch.randint(0, 200, (self.build_noisy_pixels,))
+                        image[0,pixels_x,pixels_y] = 1-image[0,pixels_x,pixels_y]
                     image = non_null*image
                 doc = torch.cat((doc, image), dim=0)
                 doc = doc.to(torch.float32)
