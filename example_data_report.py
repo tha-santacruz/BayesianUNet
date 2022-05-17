@@ -68,6 +68,7 @@ unfold = torch.nn.Unfold(kernel_size=(w_size, w_size),stride = w_size)
 fold = torch.nn.Fold(output_size=(200,200), kernel_size=(w_size, w_size), stride=w_size)
 
 counter = 0
+wanted = [1,4,10]
 
 
 for i in dl:
@@ -75,7 +76,7 @@ for i in dl:
 		bbk = i[1][j].argmax(dim=0)
 		if torch.unique(bbk[bbk!=0], return_counts=False).size(0) >= 7:
 			counter +=1
-			if counter==1:
+			if counter in wanted:
 				doc = i[0].clone().detach().to(device=device)
 				print(doc.size())
 				# to store n_forward predictions on the same batch
@@ -199,7 +200,7 @@ for i in dl:
 				plt.subplot(122)
 				plt.imshow(mutual, vmin=batch_mutual_info.min().cpu().numpy(), vmax = batch_mutual_info.max().cpu().numpy())
 				plt.axis('off')
-				plt.title('Epistemic')
+				plt.title('Epistemic uncertainty')
 				plt.tight_layout()
 				plt.savefig(f'example_report/example_uncertainty{counter}.svg', bbox_inches='tight', pad_inches=0)
 
@@ -207,7 +208,7 @@ for i in dl:
 				fig = plt.figure()
 				plt.imshow(aleatoric, vmin=batch_aletoric_std_mean.min().cpu().numpy(), vmax = batch_aletoric_std_mean.max().cpu().numpy())
 				plt.axis('off')
-				plt.title('Aleatoric')
+				plt.title('Aleatoric uncertainty')
 				plt.tight_layout()
 				plt.savefig(f'example_report/example_aleatoric{counter}.svg', bbox_inches='tight', pad_inches=0)
 				plt.close()
@@ -221,7 +222,7 @@ for i in dl:
 				plt.subplot(122)
 				plt.imshow(bin_uncert_map)
 				plt.axis('off')
-				plt.title('Uncertainity (binary)')
+				plt.title('Uncertainty (binary)')
 				plt.tight_layout()
 				plt.savefig(f'example_report/example_binary_maps{counter}.svg', bbox_inches='tight', pad_inches=0)
 				plt.close()
@@ -244,6 +245,23 @@ for i in dl:
 				plt.savefig(f'example_report/example_corrective{counter}.svg', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
+				# wrong prediction map
+				fig = plt.figure()
+				plt.subplot(131)
+				plt.imshow(bbk, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1))
+				plt.axis('off')
+				plt.title('BBK')
+				plt.subplot(132)
+				plt.imshow(prediction, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1), alpha=1)
+				plt.axis('off')
+				plt.title('Prediction')
+				plt.subplot(133)
+				plt.imshow(mutual, vmin=batch_mutual_info.min().cpu().numpy(), vmax = batch_mutual_info.max().cpu().numpy())
+				plt.axis('off')
+				plt.title('Epistemic uncertainty')
+				plt.tight_layout()
+				plt.savefig(f'example_report/example_corrective{counter}.svg', bbox_inches='tight', pad_inches=0)
+				plt.close()
 
 				# data image
 				fig = plt.figure()
