@@ -44,8 +44,8 @@ if __name__ == "__main__":
     test_dl = DataLoader(test_set, batch_size=32, shuffle=True)
 
     # define model
-    net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-    # net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
+    #net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
+    net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
 
     # load pretrained model parameters
     checkpoint_path = 'checkpoints_baseline/checkpoint_epoch60.pth'

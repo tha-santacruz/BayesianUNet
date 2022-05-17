@@ -60,6 +60,15 @@ plt.legend(handles=patches, loc='center', ncol = 1, markerscale=2, fontsize='xx-
 plt.axis('off')
 plt.savefig(f'example_data/bbk_legend.svg', bbox_inches='tight', pad_inches=0)
 
+# same but for binary maps
+hex_colors = ['#fde724', '#440154']
+labels = ["1","0"]
+patches = [ mpatches.Patch(color=hex_colors[i], label=labels[i]) for i in range(len(hex_colors)) ]
+plt.figure()
+plt.legend(handles=patches, loc='center', ncol = 1, markerscale=2, fontsize='xx-large')
+plt.axis('off')
+plt.savefig(f'example_data/uncert_legend.svg', bbox_inches='tight', pad_inches=0)
+
 # unfolding and folding
 w_size = 4 #patch size
 accuracy_tresh = 0.5
