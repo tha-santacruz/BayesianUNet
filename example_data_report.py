@@ -151,12 +151,12 @@ for i in dl:
 				bin_inacc_certain = (1-bin_acc_map)*(1-bin_uncert_map)
 
 				# save maps as pngs
-				plt.imsave("example_report/entropy.png",entropy)
-				plt.imsave("example_report/mutual.png",mutual)
-				plt.imsave("example_report/aleatoric.png",aleatoric)
-				plt.imsave("example_report/bin_acc_map.png",bin_acc_map)
-				plt.imsave("example_report/bin_uncert_map.png",bin_uncert_map)
-				plt.imsave("example_report/bin_inacc_certain.png",bin_inacc_certain)
+				plt.imsave(f"example_report/entropy{counter}.png",entropy)
+				plt.imsave(f"example_report/mutual{counter}.png",mutual)
+				plt.imsave(f"example_report/aleatoric{counter}.png",aleatoric)
+				plt.imsave(f"example_report/bin_acc_map{counter}.png",bin_acc_map)
+				plt.imsave(f"example_report/bin_uncert_map{counter}.png",bin_uncert_map)
+				plt.imsave(f"example_report/bin_inacc_certain{counter}.png",bin_inacc_certain)
 
 
 				# data visualization
