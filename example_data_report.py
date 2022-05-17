@@ -120,11 +120,10 @@ for i in dl:
 				prediction = batch_mean[j].argmax(dim=0).cpu().numpy()
 
 				#compute std to have aleatoric uncertainty
-				print(aleatoric_predictions.size())
 				aleatoric_std = aleatoric_predictions.std(dim=0)
-				print(aleatoric_std.size())
 				#compute the mean of std along the classes
-				aleatoric = aleatoric_std.mean(dim=1)[j].cpu().numpy()
+				batch_aletoric_std_mean = aleatoric_std.mean(dim=1)
+				aleatoric = batch_aletoric_std_mean[j].cpu().numpy()
 
 				# prepare uncertainity and accuracy maps
 				mask_true = i[1]
@@ -148,8 +147,16 @@ for i in dl:
 				bin_acc_map = fold(acc_expanded)[j][0]
 				bin_uncert_map = fold(uncert_expanded)[j][0]
 
-				# create 
+				# create binary coorective map
 				bin_inacc_certain = (1-bin_acc_map)*(1-bin_uncert_map)
+
+				# save maps as pngs
+				plt.imsave("entropy.png",entropy)
+				plt.imsave("mutual.png",mutual)
+				plt.imsave("aleatoric.png",aleatoric)
+				plt.imsave("bin_acc_map.png",bin_acc_map)
+				plt.imsave("bin_uncert_map.png",bin_uncert_map)
+				plt.imsave("bin_inacc_certain.png",bin_inacc_certain)
 
 
 				# data visualization
@@ -198,7 +205,7 @@ for i in dl:
 
 				# aleatoric
 				fig = plt.figure()
-				plt.imshow(aleatoric, vmin=batch_mutual_info.min().cpu().numpy(), vmax = batch_mutual_info.max().cpu().numpy())
+				plt.imshow(aleatoric, vmin=batch_aletoric_std_mean.min().cpu().numpy(), vmax = batch_aletoric_std_mean.max().cpu().numpy())
 				plt.axis('off')
 				plt.title('Aleatoric')
 				plt.tight_layout()
