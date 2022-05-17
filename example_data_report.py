@@ -58,7 +58,7 @@ patches = [ mpatches.Patch(color=hex_colors[i], label=labels[i]) for i in range(
 plt.figure()
 plt.legend(handles=patches, loc='center', ncol = 1, markerscale=2, fontsize='xx-large')
 plt.axis('off')
-plt.savefig(f'example_data/bbk_legend.svg')
+plt.savefig(f'example_data/bbk_legend.svg', bbox_inches='tight', pad_inches=0)
 
 # unfolding and folding
 w_size = 4 #patch size
@@ -120,7 +120,9 @@ for i in dl:
 				prediction = batch_mean[j].argmax(dim=0).cpu().numpy()
 
 				#compute std to have aleatoric uncertainty
+				print(aleatoric_predictions.size())
 				aleatoric_std = aleatoric_predictions.std(dim=0)
+				print(aleatoric_std.size())
 				#compute the mean of std along the classes
 				aleatoric = aleatoric_std.mean(dim=1)[j].cpu().numpy()
 
@@ -177,7 +179,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Prediction')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_pred{counter}.svg')
+				plt.savefig(f'example_report/example_pred{counter}.svg',bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 
@@ -192,14 +194,15 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Epistemic')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_uncertainty{counter}.svg')
+				plt.savefig(f'example_report/example_uncertainty{counter}.svg', bbox_inches='tight', pad_inches=0)
 
 				# aleatoric
 				fig = plt.figure()
+				plt.imshow(aleatoric, vmin=batch_mutual_info.min().cpu().numpy(), vmax = batch_mutual_info.max().cpu().numpy())
 				plt.axis('off')
 				plt.title('Aleatoric')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_aleatoric{counter}.svg')
+				plt.savefig(f'example_report/example_aleatoric{counter}.svg', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 				# binary maps
@@ -213,7 +216,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Uncertainity (binary)')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_binary_maps{counter}.svg')
+				plt.savefig(f'example_report/example_binary_maps{counter}.svg', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 				# correction map
@@ -231,7 +234,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Inaccurate and certain') 
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_corrective{counter}.svg')
+				plt.savefig(f'example_report/example_corrective{counter}.svg', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 
@@ -263,8 +266,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('BBK')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_data{counter}.svg')
+				plt.savefig(f'example_report/example_data{counter}.svg', bbox_inches='tight', pad_inches=0)
 				plt.close()
-				break
 print(f'number of resulting images : {counter}')
 			
