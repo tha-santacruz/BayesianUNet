@@ -184,7 +184,7 @@ if __name__ == '__main__':
 
     # declare model
     net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-    checkpoint_path = 'checkpoints_bayesian/checkpoint_epoch60.pth'
+    checkpoint_path = 'checkpoints_b_augmented_last/checkpoint_epoch60.pth'
     net.load_state_dict(torch.load(checkpoint_path, map_location=device))
     net.eval()
 
@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
     ##Confusion matrix 
     plt.figure()
-    sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.2%', cmap='Blues', cbar=True, xticklabels=test_set.BBK_CLASSES_list,yticklabels=test_set.BBK_CLASSES_list)
+    sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.1%', cmap='Blues', cbar=True, xticklabels=test_set.BBK_CLASSES_list,yticklabels=test_set.BBK_CLASSES_list)
     plt.xticks(rotation=45)
     plt.yticks(rotation=45)
     plt.tight_layout()
@@ -240,4 +240,5 @@ if __name__ == '__main__':
                 'Metric per class':score_table, 
                 'conf_mat' : wandb.Image(plt),
             })
+    plt.savefig("example_report/cf_matrix.png")
     plt.close()
