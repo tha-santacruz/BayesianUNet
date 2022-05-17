@@ -120,7 +120,8 @@ for i in dl:
 			#compute std to have aleatoric uncertainty
 			aleatoric_std = aleatoric_predictions.std(dim=0)
 			#compute the mean of std along the classes
-			aleatoric = aleatoric_std.mean(dim=1)[j].cpu().numpy()
+			batch_aletoric_std_mean = aleatoric_std.mean(dim=1)
+			aleatoric = batch_aletoric_std_mean[j].cpu().numpy()
 
 			# prepare uncertainity and accuracy maps
 			mask_true = i[1]
@@ -187,7 +188,7 @@ for i in dl:
 			plt.title('Epistemic') # equal to mutual information
 
 			plt.subplot(336)
-			plt.imshow(aleatoric)
+			plt.imshow(aleatoric, vmin=batch_aletoric_std_mean.min().cpu().numpy(), vmax = batch_aletoric_std_mean.max().cpu().numpy())
 			plt.axis('off')
 			plt.title('Aleatoric')
 

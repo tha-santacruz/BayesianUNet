@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     # define model
     #net = BayesianUNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
-    net = UNet(n_channels=7, n_classes=9, bilinear=args.bilinear)
+    net = UNet(n_channels=7, n_classes=9, bilinear=False).to(device=device)
 
     # load pretrained model parameters
     checkpoint_path = 'checkpoints_baseline/checkpoint_epoch60.pth'
