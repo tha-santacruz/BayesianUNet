@@ -260,7 +260,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Epistemic uncertainty')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_corrective{counter}.svg', bbox_inches='tight', pad_inches=0)
+				plt.savefig(f'example_report/example_wrongpreds{counter}.svg', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 				# data image
