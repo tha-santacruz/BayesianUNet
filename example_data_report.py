@@ -58,7 +58,7 @@ patches = [ mpatches.Patch(color=hex_colors[i], label=labels[i]) for i in range(
 plt.figure()
 plt.legend(handles=patches, loc='center', ncol = 1, markerscale=2, fontsize='xx-large')
 plt.axis('off')
-plt.savefig(f'example_data/bbk_legend.png')
+plt.savefig(f'example_data/bbk_legend.svg')
 
 # unfolding and folding
 w_size = 4 #patch size
@@ -177,44 +177,61 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Prediction')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_pred{counter}.png')
+				plt.savefig(f'example_report/example_pred{counter}.svg')
 				plt.close()
 
 
-				# uncertainty
+				# bayesian uncertainty
 				fig = plt.figure()
-				plt.subplot(131)
+				plt.subplot(121)
 				plt.imshow(entropy, vmin=batch_pred_entropy.min().cpu().numpy(), vmax = batch_pred_entropy.max().cpu().numpy())
 				plt.axis('off')
 				plt.title('Entropy')
-				plt.subplot(132)
+				plt.subplot(122)
 				plt.imshow(mutual, vmin=batch_mutual_info.min().cpu().numpy(), vmax = batch_mutual_info.max().cpu().numpy())
 				plt.axis('off')
 				plt.title('Epistemic')
-				plt.subplot(133)
-				plt.imshow(aleatoric)
+				plt.tight_layout()
+				plt.savefig(f'example_report/example_uncertainty{counter}.svg')
+
+				# aleatoric
+				fig = plt.figure()
 				plt.axis('off')
 				plt.title('Aleatoric')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_uncertainty{counter}.png')
+				plt.savefig(f'example_report/example_aleatoric{counter}.svg')
 				plt.close()
 
 				# binary maps
 				fig = plt.figure()
-				plt.subplot(131)
+				plt.subplot(121)
 				plt.imshow(bin_acc_map)
 				plt.axis('off')
 				plt.title('Accuracy (binary)')
-				plt.subplot(132)
+				plt.subplot(122)
 				plt.imshow(bin_uncert_map)
 				plt.axis('off')
 				plt.title('Uncertainity (binary)')
+				plt.tight_layout()
+				plt.savefig(f'example_report/example_binary_maps{counter}.svg')
+				plt.close()
+
+				# correction map
+				fig = plt.figure()
+				plt.subplot(131)
+				plt.imshow(bbk, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1))
+				plt.axis('off')
+				plt.title('BBK')
+				plt.subplot(132)
+				plt.imshow(prediction, cmap=bbk_cmap, norm=colors.BoundaryNorm(bbk_scale, len(bbk_scale)-1), alpha=1)
+				plt.axis('off')
+				plt.title('Prediction')
 				plt.subplot(133)
 				plt.imshow(bin_inacc_certain)
 				plt.axis('off')
 				plt.title('Inaccurate and certain') 
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_binary_maps{counter}.png')
+				plt.savefig(f'example_report/example_corrective{counter}.svg')
 				plt.close()
 
 
@@ -246,7 +263,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('BBK')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_data{counter}.png')
+				plt.savefig(f'example_report/example_data{counter}.svg')
 				plt.close()
 				break
 print(f'number of resulting images : {counter}')
