@@ -68,7 +68,7 @@ unfold = torch.nn.Unfold(kernel_size=(w_size, w_size),stride = w_size)
 fold = torch.nn.Fold(output_size=(200,200), kernel_size=(w_size, w_size), stride=w_size)
 
 counter = 0
-wanted = [1,4,10]
+wanted = [1,4,6,10]
 
 
 for i in dl:
