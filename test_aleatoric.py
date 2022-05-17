@@ -86,9 +86,9 @@ def evaluate_uncertainty(net,
                 
                 # predict noisy image
                 disable_dropout(net)
-                mask_pred = net(image_aleatoric)
+                mask_pred_aleatoric = net(image_aleatoric)
                 # concatenate prediction to the other made on the same batch
-                aleatoric_predictions = torch.cat((aleatoric_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
+                aleatoric_predictions = torch.cat((aleatoric_predictions,mask_pred_aleatoric.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
                 
                 # predict with dropout
                 enable_dropout(net)
