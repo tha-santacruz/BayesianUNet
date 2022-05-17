@@ -75,7 +75,7 @@ for i in dl:
 		bbk = i[1][j].argmax(dim=0)
 		if torch.unique(bbk[bbk!=0], return_counts=False).size(0) >= 7:
 			counter +=1
-			if counter==4:
+			if counter==1:
 				doc = i[0].clone().detach().to(device=device)
 				print(doc.size())
 				# to store n_forward predictions on the same batch
