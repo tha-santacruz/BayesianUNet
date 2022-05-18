@@ -64,8 +64,8 @@ if __name__ == "__main__":
     # create wandb objects for visualisation
     plt.figure()
     sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.1%', cmap='Blues', cbar=True, xticklabels=test_set.BBK_CLASSES_list,yticklabels=test_set.BBK_CLASSES_list)
-    plt.xticks(rotation=45)
-    plt.yticks(rotation=45)
+    plt.xticks(rotation=45, rotation_mode="default")
+    plt.yticks(rotation=45, rotation_mode="anchor")
     plt.tight_layout()
 
     class_labels = {0 : "null",
