@@ -300,7 +300,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('BBK')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_data{counter}.svg', bbox_inches='tight', pad_inches=0)
+				plt.savefig(f'example_report/example_data{counter}.png', bbox_inches='tight', pad_inches=0)
 				plt.close()
 print(f'number of resulting images : {counter}')
 			
