@@ -196,7 +196,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Prediction')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_pred{counter}.svg',bbox_inches='tight', pad_inches=0)
+				plt.savefig(f'example_report/example_pred{counter}.png',bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 
@@ -211,7 +211,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Epistemic uncertainty')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_uncertainty{counter}.svg', bbox_inches='tight', pad_inches=0)
+				plt.savefig(f'example_report/example_uncertainty{counter}.png', bbox_inches='tight', pad_inches=0)
 
 				# aleatoric
 				fig = plt.figure()
@@ -219,7 +219,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Aleatoric uncertainty')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_aleatoric{counter}.svg', bbox_inches='tight', pad_inches=0)
+				plt.savefig(f'example_report/example_aleatoric{counter}.png', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 				# binary maps
@@ -233,7 +233,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Uncertainty (binary)')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_binary_maps{counter}.svg', bbox_inches='tight', pad_inches=0)
+				plt.savefig(f'example_report/example_binary_maps{counter}.png', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 				# correction map
@@ -251,7 +251,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Inaccurate and certain') 
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_corrective{counter}.svg', bbox_inches='tight', pad_inches=0)
+				plt.savefig(f'example_report/example_corrective{counter}.png', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 				# wrong prediction map
@@ -269,7 +269,7 @@ for i in dl:
 				plt.axis('off')
 				plt.title('Epistemic uncertainty')
 				plt.tight_layout()
-				plt.savefig(f'example_report/example_wrongpreds{counter}.svg', bbox_inches='tight', pad_inches=0)
+				plt.savefig(f'example_report/example_wrongpreds{counter}.png', bbox_inches='tight', pad_inches=0)
 				plt.close()
 
 				# data image
