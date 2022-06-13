@@ -18,9 +18,6 @@ def evaluate(net, dataloader, device):
     accuracy_per_class = 0
 
     F1_coeff_per_class  = 0
-
-    IOU_coeff = 0 
-    IOU_coeff_per_class = 0
     
     cf_matrix = np.zeros(shape = (net.n_classes,net.n_classes))
 
@@ -36,7 +33,7 @@ def evaluate(net, dataloader, device):
             mask_pred = net(image)
 
             # compute confidence matrix
-            cf_matrix = cf_matrix + confusion_matrix(mask_true.argmax(dim=1).view(-1).cpu(),mask_pred.argmax(dim=1).view(-1).cpu(), labels = np.arange(0,9))
+            cf_matrix = cf_matrix + confusion_matrix(mask_true.argmax(dim=1).view(-1).cpu(),mask_pred.argmax(dim=1).view(-1).cpu(), labels = np.arange(0,net.n_classes))
 
             # convert to one-hot format
             if net.n_classes == 1:
@@ -54,9 +51,6 @@ def evaluate(net, dataloader, device):
                 accuracy_per_class += metrics.multiclass_accuracy(mask_pred_labels, mask_true_labels, num_classes = net.n_classes)
                 #compute F1 score
                 F1_coeff_per_class += metrics.F1_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-                #compute IOU score 
-                IOU_coeff += metrics.IOU_score(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
-                IOU_coeff_per_class += metrics.IOU_score_per_class(mask_pred_labels, mask_true_labels, num_classes= net.n_classes)
                
                 #transform prediction in one-hot to compute dice score (ignoring background for dice score)
                 mask_pred = F.one_hot(mask_pred.argmax(dim=1), net.n_classes).permute(0,3,1,2).float()
@@ -71,4 +65,4 @@ def evaluate(net, dataloader, device):
     if num_val_batches == 0:
         return dice_score, accuracy_score, accuracy_per_class
 
-    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches, F1_coeff_per_class/ num_val_batches, IOU_coeff/num_val_batches, IOU_coeff_per_class/num_val_batches,  cf_matrix
+    return dice_score / num_val_batches, accuracy_score/num_val_batches, accuracy_per_class/num_val_batches, F1_coeff_per_class/num_val_batches, cf_matrix

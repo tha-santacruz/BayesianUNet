@@ -13,7 +13,7 @@ class PotsdamDataset:
 	def __init__(self, split: str = "train", random_seed = 1, augment: bool = True):
 		"""Initialization method"""
 		# Constants
-		self.ROOT = "./Potsdam_data/tiles_test/"
+		self.ROOT = "./Potsdam_data/tiles/"
 		self.SPLIT_SIZE = {"train": 0.7, "test": 0.2, "val": 0.1}
 		self.CLASSES_list = [
 			"impervious_surfaces",
@@ -30,8 +30,8 @@ class PotsdamDataset:
 			3 : "tree", 
 			4 : "car", 
 			5 : "background"}
-		self.IN_CHANNELS = 5
-		self.OUT_CHANNELS = 6
+		self.N_CHANNELS = 5
+		self.N_CLASSES = 6
 		
 		# Available tiles list
 		self.tileslist = os.listdir(self.ROOT+"input/")
@@ -86,11 +86,9 @@ class PotsdamDataset:
 		self.augment = augment
 		# Define transforms for augmentation of rgbir channels
 		# Noise percent
-		percent_noise = 0.2
+		percent_noise = 0.1
 		# Noise std for R-G-B-IR-DSM channels
 		self.noise_std = self.std_vals_tiles[:5].squeeze()*percent_noise
-		self.noise_std[4] = self.noise_std[4]*0.1
-		
 
 	def __len__(self):
 		"""returns length of valid tiles set"""
@@ -124,7 +122,6 @@ class PotsdamDataset:
 		# Replace negative values by 0 using ReLU
 		F.relu(image, inplace=True)
 		# To one hot encoding
-		print(image.size())
 		image = F.one_hot(image[0,:,:].to(torch.int64), num_classes = len(self.CLASSES_list))
 		image = image.permute(2,0,1)
 		label = image.to(torch.float32)

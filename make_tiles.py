@@ -25,6 +25,7 @@ LABELS_RGB = [
 	torch.tensor((255,255,0)),
 	torch.tensor((255,0,0))
 	]
+TSIZE = 300
 
 if __name__ == "__main__":
 	## Creating directory to store tiles
@@ -53,12 +54,12 @@ if __name__ == "__main__":
 			mask = torch.all(lt_label==LABELS_RGB[i],dim=2)
 			lt_label_onedim[mask]=i
 		## Making small tiles
-		for i in range(0,lt_label.size(0),200):
-			for j in range(0,lt_label.size(1),200):
+		for i in range(0,lt_label.size(0),TSIZE):
+			for j in range(0,lt_label.size(1),TSIZE):
 				try:
-					st_label = lt_label_onedim[i:i+200,j:j+200]
+					st_label = lt_label_onedim[i:i+TSIZE,j:j+TSIZE]
 					imsave(ROOT+TILESDIR+"target/"+f"tile{tilenum}.tif",st_label.numpy(),check_contrast=False)
-					st_document = torch.cat([lt_RGBIR[i:i+200,j:j+200],lt_DSM[i:i+200,j:j+200].unsqueeze(dim=2)],dim=2)
+					st_document = torch.cat([lt_RGBIR[i:i+TSIZE,j:j+TSIZE],lt_DSM[i:i+TSIZE,j:j+TSIZE].unsqueeze(dim=2)],dim=2)
 					imsave(ROOT+TILESDIR+"input/"+f"tile{tilenum}.tif",st_document.permute(2,0,1).numpy(),check_contrast=False)
 					tilenum+=1
 				except:

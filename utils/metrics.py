@@ -41,7 +41,6 @@ def dice_loss(input: Tensor, target: Tensor, multiclass: bool = False):
 
 
 def accuracy_coeff(preds, target, num_classes):
-    #assert input.size() == target.size()
     return torchmetrics.functional.accuracy(preds = preds,
                                             target = target,
                                             average='macro',
@@ -55,7 +54,6 @@ def accuracy_coeff(preds, target, num_classes):
 
 
 def multiclass_accuracy(preds, target, num_classes):
-
     return torchmetrics.functional.accuracy(preds = preds,
                                             target = target,
                                             average=None,
@@ -68,8 +66,6 @@ def multiclass_accuracy(preds, target, num_classes):
                                             ignore_index=None)
 
 def F1_score(preds, target, num_classes):
-
-    
     return torchmetrics.functional.f1_score(preds,
                         target,
                         num_classes=num_classes,
@@ -80,18 +76,3 @@ def F1_score(preds, target, num_classes):
                         top_k=None,
                         multiclass=None,
                         )
-
-
-
-def IOU_score(preds, target, num_classes):
-
-    return torchmetrics.functional.jaccard_index(preds,
-                                                target,
-                                                num_classes = num_classes,
-                                                reduction='elementwise_mean')
-def IOU_score_per_class(preds, target, num_classes):
-
-    return torchmetrics.functional.jaccard_index(preds,
-                                                target,
-                                                num_classes = num_classes,
-                                                reduction='none')
