@@ -6,6 +6,7 @@ import matplotlib.colors as colors
 import matplotlib.patches as mpatches
 import numpy as np
 from bayesian_unet import BayesianUNet
+import os
 
 # constants
 W_SIZE = 4 # patch size to compute uncertainty performance metrics
@@ -158,6 +159,10 @@ def predict(net, inputs, targets=None, device="cpu", normalization_mean=0, norma
 if __name__ == "__main__":
 	# device
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+	# create repo for predictions if needed
+	if not os.path.exists("./predictions"):
+		os.mkdir("./predictions")
 
 	# Get data to evaluate
 	test_set = PotsdamDataset(split = "test", random_seed = 1, augment=False)
