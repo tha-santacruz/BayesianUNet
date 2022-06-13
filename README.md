@@ -20,8 +20,8 @@ to test a model :
 2	Metrics are printed in the console and the confusion matrix is saved as an image
 
 to predict an image :
-1	Run predict.py by specifing the model and the image to predict
-2	Try to expand the image to create a batch of the size that has been used to train the model.
+1	Run predict.py by specifing the model and the image(s) to predict
+2	If needed, try to expand the image(s) to create a batch of the size that has been used to train the model.
 	This offers better results
 3	If a ground truth is provided, "innacurate but certain" maps are produced
 4	Resulting predictions and maps are saved in the "predictions" repository

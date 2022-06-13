@@ -24,32 +24,6 @@ import numpy as np
 
 dir_checkpoint = Path('./checkpoints/')
 
-"""# util function for generating interactive image mask from components
-def wb_mask(bg_img, pred_mask, true_mask, labels):
-	return wandb.Image(bg_img, masks={
-		"prediction" : {"mask_data" : pred_mask, "class_labels" : labels},
-		"ground truth" : {"mask_data" : true_mask, "class_labels" : labels}}
-		)
-
-#utils to set the colors on the interactive masks on wandb
-#TODO: deplace this block in utils 
-colors_dict =   {0 : 1,
-				1 : 13,
-				2 : 0,
-				3 : 8,
-				4 : 2,
-				5 : 12,
-				6 : 11,
-				7 : 15, 
-				8 : 3}
-
-def set_bbk_colors(img):
-	return np.vectorize(colors_dict.get)(img)
-
-def set_classlabels(class_labels):
-	new_dict = {newkey: class_labels[oldkey] for (oldkey, newkey) in colors_dict.items()}
-	return new_dict"""
-
 def train_net(net,
 			  train_set, 
 			  val_set,
