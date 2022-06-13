@@ -25,7 +25,7 @@ LABELS_RGB = [
 	torch.tensor((255,255,0)),
 	torch.tensor((255,0,0))
 	]
-TSIZE = 400
+TSIZE = 200
 
 if __name__ == "__main__":
 	## Creating directory to store tiles

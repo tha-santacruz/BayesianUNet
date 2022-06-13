@@ -3,5 +3,5 @@
 __pycache__
 checkpoints
 wandb
-INTERRUPTED.pth
 Potsdam_data
+predictions

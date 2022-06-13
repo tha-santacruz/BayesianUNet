@@ -1,10 +1,9 @@
 import logging
 import torch
 import torch.nn.functional as F
-from utils.dataset import BBKDataset
+from utils.potsdam_dataset import PotsdamDataset
 from torch.utils.data import DataLoader
 import utils.metrics as metrics
-from unet import UNet
 from bayesian_unet import BayesianUNet
 from evaluate import evaluate
 import seaborn as sns
@@ -61,7 +60,7 @@ def evaluate_uncertainty(net,
                 dropout_predictions = torch.cat((dropout_predictions,mask_pred.cpu().softmax(dim=1).unsqueeze(dim=0)),dim=0)
 
                 # compute confidence matrix
-                cf_matrix = cf_matrix + confusion_matrix(mask_true.argmax(dim=1).view(-1).cpu(),mask_pred.argmax(dim=1).view(-1).cpu(), labels = np.arange(0,9))
+                cf_matrix = cf_matrix + confusion_matrix(mask_true.argmax(dim=1).view(-1).cpu(),mask_pred.argmax(dim=1).view(-1).cpu(), labels = np.arange(0,net.n_classes))
 
 
         #Compute uncertainty indicateurs
@@ -143,16 +142,17 @@ def enable_dropout(model):
 
 if __name__ == '__main__':
     """ Evaluate samples of the test set to get performance metrics"""
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     # set device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logging.info(f'Using device {device}')
 
     # Create datasets
-    train_set = PotsdamDataset(split = "train", random_seed = 1, augment=True)
-    val_set = PotsdamDataset(split = "val", random_seed = 1, augment=True)
+    test_set = PotsdamDataset(split = "test", random_seed = 1, augment=False)
+    test_dl = DataLoader(test_set, batch_size=16, shuffle=False)
 
     # Declare model
-    net = BayesianUNet(n_channels=train_set.N_CHANNELS, n_classes=train_set.N_CLASSES, bilinear=args.bilinear)
+    net = BayesianUNet(n_channels=test_set.N_CHANNELS, n_classes=test_set.N_CLASSES, bilinear=False).to(device=device)
     # Choose the trained parameters to load in the model
     checkpoint_path = 'checkpoints/checkpoint_epoch5.pth'
     net.load_state_dict(torch.load(checkpoint_path, map_location=device))
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     
     ##Confusion matrix 
     plt.figure()
-    sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.1%', cmap='Blues', cbar=True, xticklabels=test_set.BBK_CLASSES_list,yticklabels=test_set.BBK_CLASSES_list)
+    sns.heatmap(cf_matrix, annot=True, annot_kws={"size":8}, fmt='.1%', cmap='Blues', cbar=True, xticklabels=test_set.CLASSES_list,yticklabels=test_set.CLASSES_list)
     plt.tight_layout()
     plt.savefig("cf_matrix.png")
     plt.close()
