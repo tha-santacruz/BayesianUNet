@@ -1,8 +1,8 @@
 # Bayesian UNet model 
 
-This repository provides the well-known UNet model converted to a Bayesian UNet model.
+This repository provides the well-known UNet model converted to a Bayesian UNet model. [1]
 This model has been coded using Pytorch.
-The model has been implemented using the Monte Carlo Dropout method [1] 
+The model has been implemented using the Monte Carlo Dropout method [2] 
 It consists of adding a dropout layer (with a certain probability) at the end of each convolution layer during training and testing steps.
 This Bayesian model provides different scores (entropy and mutual information) that could be used to characterize uncertainty in predictions. 
 
@@ -34,4 +34,6 @@ This Bayesian model provides different scores (entropy and mutual information) t
 
 ## References
 
-GAL, Yarin et GHAHRAMANI, Zoubin. Dropout as a bayesian approximation: Representing model uncertainty in deep learning. In : international conference on machine learning. PMLR, 2016. p. 1050-1059. [1]
+RONNEBERGER, Olaf, FISCHER, Philipp, et BROX, Thomas. U-net: Convolutional networks for biomedical image segmentation. In : International Conference on Medical image computing and computer-assisted intervention. Springer, Cham, 2015. p. 234-241. [1]
+
+GAL, Yarin et GHAHRAMANI, Zoubin. Dropout as a bayesian approximation: Representing model uncertainty in deep learning. In : international conference on machine learning. PMLR, 2016. p. 1050-1059. [2]
