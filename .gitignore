@@ -1,7 +1,7 @@
 .idea
 .vscode
 __pycache__
-checkpoints
-wandb
-Potsdam_data
-predictions
+checkpoints/
+wandb/
+Potsdam_data/
+predictions/
