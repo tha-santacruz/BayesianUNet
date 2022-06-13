@@ -2,15 +2,16 @@
 
 This repository provides the well-known UNet model converted to a Bayesian UNet model.
 This model has been coded using Pytorch.
-This Bayesian model has been implemented using the Monte Carlo Dropout method [1]
+The model has been implemented using the Monte Carlo Dropout method [1] 
 It consists of adding a dropout layer (with a certain probability) at the end of each convolution layer during training and testing steps.
+This Bayesian model provides different scores (entropy and mutual information) that could be used to characterize uncertainty in predictions. 
 
 ## To create tiles : 
-1	Download the Potsdam Dataset from this URL:
+1.	Download the Potsdam Dataset from this URL:
 	https://www.isprs.org/education/benchmarks/UrbanSemLab/Default.aspx
-2	Uncompress it, and place the folders "1_DSM", "4_Ortho_RGBIR" and "5_Labels_all" 
+2.	Uncompress it, and place the folders "1_DSM", "4_Ortho_RGBIR" and "5_Labels_all" 
 	into the "Potsdam_data" directory
-3	Run the "make_tils.py" file that will create input and target tiles in "Potsdam_data/tiles"
+3.	Run the "make_tils.py" file that will create input and target tiles in "Potsdam_data/tiles"
 
 ## To train a model :
 1.	Run train.py with the desired parameters. 
