@@ -15,13 +15,12 @@ This Bayesian model provides different scores (entropy and mutual information) t
 
 ## To train a model :
 1.	Run train.py with the desired parameters. 
-	Refer to the arguments parser in the code to see the possible settings
+	Refer to the arguments parser in the code to see the possible settings.
 2.	Training can be monitored using the Weights and Biases tool.
 	The URL to follow the training is provided in the console once validation occurs
 
 ## To test a model :
 1.	Run test.py with the desired parameters. 
-	Refer to the arguments parser in the code to see the possible settings
 2.	Metrics are printed in the console and the confusion matrix is saved as an image
 
 ## To predict an image :
