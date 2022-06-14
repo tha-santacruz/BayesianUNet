@@ -1,13 +1,13 @@
 ## Importing packages
-from skimage.io import imread
 import os
-from os.path import exists
+import random
+
 import torch
+from skimage.io import imread
 from torch import nn
 from torch.nn import functional as F
-from torchvision import transforms
 from tqdm import tqdm
-import random
+
 
 class PotsdamDataset:
 	def __init__(self, split: str = "train", random_seed = 1, augment: bool = True):
@@ -100,8 +100,8 @@ class PotsdamDataset:
 		## Create document
 		image= torch.tensor(imread(self.ROOT+"input/"+tile))
 		# Padding if needed
-		if image.size()[-2:] != (200,200):
-			image = nn.ConstantPad2d((0, 200-image.size()[2], 0, 200-image.size()[1]), 0)(image)
+		#if image.size()[-2:] != (200,200):
+		#	image = nn.ConstantPad2d((0, 200-image.size()[2], 0, 200-image.size()[1]), 0)(image)
 		# Replace negative values by 0 using ReLU
 		F.relu(image, inplace=True)
 		# Augment if requested
