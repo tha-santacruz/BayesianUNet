@@ -1,26 +1,23 @@
+## Importing packages
 import argparse
 import logging
 import sys
 from pathlib import Path
-from datetime import datetime
 
+import matplotlib.pyplot as plt
+import seaborn as sns
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import wandb
 from torch import optim
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from utils.potsdam_dataset import PotsdamDataset
-from utils.metrics import dice_loss
-from evaluate import evaluate
 from bayesian_unet import BayesianUNet
-
-import matplotlib.pyplot as plt
-from sklearn.metrics import ConfusionMatrixDisplay
-import seaborn as sns
-import numpy as np
+from evaluate import evaluate
+from utils.metrics import dice_loss
+from utils.potsdam_dataset import PotsdamDataset
 
 dir_checkpoint = Path('./checkpoints/')
 

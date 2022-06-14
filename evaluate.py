@@ -1,11 +1,12 @@
-import logging 
-
+## Importing packages
+import numpy as np
 import torch
 import torch.nn.functional as F
-from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
-import numpy as np
+from tqdm import tqdm
+
 import utils.metrics as metrics
+
 
 def evaluate(net, dataloader, device):
     net.eval()

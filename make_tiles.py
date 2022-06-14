@@ -1,9 +1,9 @@
 ## Importing packages
-from skimage.io import imread, imsave
-from pathlib import Path
 import os
 from os.path import exists
+
 import torch
+from skimage.io import imread, imsave
 from tqdm import tqdm
 
 ROOT = "./Potsdam_data/"

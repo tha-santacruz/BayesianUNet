@@ -1,18 +1,19 @@
+## Importing packages
 import logging
-import torch
-import torch.nn.functional as F
-from utils.potsdam_dataset import PotsdamDataset
-from torch.utils.data import DataLoader
-import utils.metrics as metrics
-from bayesian_unet import BayesianUNet
-from evaluate import evaluate
-import seaborn as sns
-import wandb
-from datetime import datetime
+
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import tqdm
+import seaborn as sns
+import torch
+import torch.nn.functional as F
 from sklearn.metrics import confusion_matrix
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+
+import utils.metrics as metrics
+from bayesian_unet import BayesianUNet
+from utils.potsdam_dataset import PotsdamDataset
+
 
 # Source to compute entropy and mutual information : 
 # https://stackoverflow.com/questions/63285197/measuring-uncertainty-using-mc-dropout-on-pytorch
