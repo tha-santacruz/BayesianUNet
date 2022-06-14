@@ -1,6 +1,6 @@
 # Pytorch Bayesian UNet model for segmentation and uncertainty prediction 
 
-This repository provides the well-known UNet model converted to a Bayesian UNet model [[1]](#1).
+This repository provides the well-known UNet model [[1]](#1) converted to a Bayesian UNet model.
 This model has been coded using Pytorch. This code is a modified version of the original the original implementation of UNet model in Pytorch by milesial (https://github.com/milesial/Pytorch-UNet).
 The model has been implemented using the Monte Carlo Dropout method [[2]](#2).
 It consists of adding a dropout layer (with a certain probability) at the end of each convolution layer during training and testing steps.
