@@ -107,7 +107,7 @@ class PotsdamDataset:
 		# Augment if requested
 		if self.augment:
 			for channel in range(len(self.noise_std)):
-				image[channel] = image[channel] + torch.normal(mean=0, std=self.noise_std[channel], size=(200,200))
+				image[channel] = image[channel] + torch.normal(mean=0, std=self.noise_std[channel], size=(image.size(2),image.size(3)))
 				F.relu(image, inplace=True)
 		document = (image-self.mean_vals_tiles).div(self.std_vals_tiles)
 		## Create label 
@@ -117,8 +117,8 @@ class PotsdamDataset:
 			image = image.unsqueeze(dim=2)
 		image = image.permute(2,0,1)
 		# Padding if needed
-		if image.size()[-2:] != (200,200):
-			image = nn.ConstantPad2d((0, 200-image.size()[2], 0, 200-image.size()[1]), 0)(image)
+		#if image.size()[-2:] != (200,200):
+		#	image = nn.ConstantPad2d((0, 200-image.size()[2], 0, 200-image.size()[1]), 0)(image)
 		# Replace negative values by 0 using ReLU
 		F.relu(image, inplace=True)
 		# To one hot encoding
