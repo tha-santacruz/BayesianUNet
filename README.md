@@ -1,4 +1,4 @@
-# Bayesian UNet model for uncertainty characterisation
+# Pytorch Bayesian UNet model for segmentation and uncertainty prediction 
 
 This repository provides the well-known UNet model converted to a Bayesian UNet model [[1]](#1).
 This model has been coded using Pytorch. This code is a modificied version of the original the original implementation of UNet model in Pytorch (https://github.com/milesial/Pytorch-UNet).
