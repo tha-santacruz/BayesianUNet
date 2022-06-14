@@ -7,12 +7,12 @@ It consists of adding a dropout layer (with a certain probability) at the end of
 This Bayesian model provides different scores (entropy and mutual information) that can be used to characterize uncertainty in predictions. 
 
 ## To set up the Python environment : 
-1.	If you use conda, execute '''$ conda env create --name envname --file=environments.yml'''
-2.	If you use pip, execute '''$ pip install -r requirements.txt'''
+1.	If you use conda, execute ```$ conda env create --name envname --file=environments.yml```
+2.	If you use pip, execute ```$ pip3 install -r requirements.txt```
 3.	Install pytorch by following the instructions of the Pytorch documentation : 		https://pytorch.org/get-started/locally/
 
 ## To create tiles : 
-1.	Download the Potsdam Dataset from this URL:
+1.	Download the Potsdam Dataset (International Society for Photogrammetry and Remote Sensing, 2022) from this URL:
 	https://www.isprs.org/education/benchmarks/UrbanSemLab/Default.aspx
 2.	Uncompress it, and place the folders "1_DSM", "4_Ortho_RGBIR" and "5_Labels_all" 
 	into the "Potsdam_data" directory
