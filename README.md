@@ -11,7 +11,7 @@ This Bayesian model provides different scores (entropy and mutual information) t
 	https://www.isprs.org/education/benchmarks/UrbanSemLab/Default.aspx
 2.	Uncompress it, and place the folders "1_DSM", "4_Ortho_RGBIR" and "5_Labels_all" 
 	into the "Potsdam_data" directory
-3.	Run the "make_tils.py" file that will create input and target tiles in "Potsdam_data/tiles"
+3.	Run the "make_tiles.py" file that will create input and target tiles in "Potsdam_data/tiles"
 
 ## To train a model :
 1.	Run train.py with the desired parameters. 
