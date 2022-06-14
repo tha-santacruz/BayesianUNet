@@ -17,24 +17,24 @@ This Bayesian model provides different scores (entropy and mutual information) t
 	https://www.isprs.org/education/benchmarks/UrbanSemLab/Default.aspx
 3.	Uncompress it, and place the folders "1_DSM/", "4_Ortho_RGBIR/" and "5_Labels_all/" 
 	into the "Potsdam_data/" directory
-4.	Run the "make_tiles.py" file that will create input and target tiles in 			"Potsdam_data/tiles"
+4.	Run ```python make_tiles.py```. It will create input and target tiles in "Potsdam_data/tiles/"
 
 ## To train a model :
-1.	Run train.py with the desired parameters. 
+1.	Run ```python train.py``` with the desired parameters. 
 	Refer to the arguments parser in the code to see the possible settings.
 2.	Training can be monitored using the Weights and Biases tool (see https://docs.wandb.ai/quickstart).
 	The URL to follow the training is provided in the console once validation occurs
 
 ## To test a model :
-1.	Run test.py with the desired parameters. 
+1.	Run ```python test.py``` with the desired parameters. 
 2.	Metrics are printed in the console and the confusion matrix is saved as an image
 
 ## To predict an image :
-1.	Run predict.py by specifing the model and the image(s) to predict
+1.	Run ```python predict.py``` by specifing the model and the image(s) to predict.
 2.	If needed, try to expand the image(s) to create a batch of the size that has been used to train the model.
 	This offers better results.
 3.	If a ground truth is provided, "innacurate but certain" maps are produced
-4.	Resulting predictions and maps are saved in the "predictions" repository
+4.	Resulting predictions and maps are saved in the "predictions/" repository
 
 
 ## References
