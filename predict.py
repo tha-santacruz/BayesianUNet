@@ -173,7 +173,7 @@ if __name__ == "__main__":
 	# Declare model
 	net = BayesianUNet(n_channels=test_set.N_CHANNELS, n_classes=test_set.N_CLASSES, bilinear=False).to(device=device)
 	# Choose the trained parameters to load in the model
-	checkpoint_path = 'checkpoints/checkpoint_epoch5.pth'
+	checkpoint_path = 'checkpoints/checkpoint_epoch10.pth'
 	net.load_state_dict(torch.load(checkpoint_path, map_location=device))
 	net.eval()
 
@@ -181,4 +181,3 @@ if __name__ == "__main__":
 	fold = torch.nn.Fold(output_size=(inputs.size(2),inputs.size(3)), kernel_size=(W_SIZE, W_SIZE), stride=W_SIZE)
 
 	predict(net=net, inputs=inputs, targets=targets, device=device, normalization_mean=test_set.mean_vals_tiles, normalization_std=test_set.std_vals_tiles)
-	

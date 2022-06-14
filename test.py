@@ -155,7 +155,7 @@ if __name__ == '__main__':
     # Declare model
     net = BayesianUNet(n_channels=test_set.N_CHANNELS, n_classes=test_set.N_CLASSES, bilinear=False).to(device=device)
     # Choose the trained parameters to load in the model
-    checkpoint_path = 'checkpoints/checkpoint_epoch5.pth'
+    checkpoint_path = 'checkpoints/checkpoint_epoch10.pth'
     net.load_state_dict(torch.load(checkpoint_path, map_location=device))
     net.eval()
 
