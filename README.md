@@ -8,7 +8,7 @@ This Bayesian model provides different scores (entropy and mutual information) t
 
 ## To set up the Python environment : 
 1.	If you use conda, execute ```$ conda env create --name envname --file=environments.yml```
-2.	If you use pip, execute ```$ pip install -r requirements.txt
+2.	If you use pip, execute ```$ pip3 install -r requirements.txt```
 3.	Install pytorch by following the instructions of the Pytorch documentation : 		https://pytorch.org/get-started/locally/
 
 ## To create tiles : 
