@@ -184,7 +184,7 @@ def train_net(net,
 def get_args():
 	parser = argparse.ArgumentParser(description='Train the UNet on images and target masks')
 	parser.add_argument('--epochs', '-e', metavar='E', type=int, default=10, help='Number of epochs')
-	parser.add_argument('--batch-size', '-b', dest='batch_size', metavar='B', type=int, default=8, help='Batch size')
+	parser.add_argument('--batch-size', '-b', dest='batch_size', metavar='B', type=int, default=4, help='Batch size')
 	parser.add_argument('--learning-rate', '-l', metavar='LR', type=float, default=1e-2,
 						help='Learning rate', dest='lr')
 	parser.add_argument('--patience', '-p', metavar='P', type=int, default=20,
