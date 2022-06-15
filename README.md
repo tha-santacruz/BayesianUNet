@@ -3,8 +3,8 @@
 This repository provides the well-known UNet model [[1]](#1) converted to a Bayesian UNet model.
 This model has been coded using Pytorch. This code is a modified version of the original the original implementation of UNet model in Pytorch by milesial (https://github.com/milesial/Pytorch-UNet).
 The model has been implemented using the Monte Carlo Dropout method [[2]](#2).
-It consists of adding a dropout layer (with a certain probability) at the end of each convolution layer used both during training and testing steps.
-This Bayesian model provides different scores (entropy and mutual information) that can be used to characterize uncertainty in predictions. 
+It consists of adding a dropout layer at the end of each convolution layer, which is used both during training and testing times.
+This Bayesian model provides different scores (entropy and mutual information) that characterize uncertainty in predictions. 
 
 ## To set up the Python environment : 
 1.	If you use conda, execute ```$ conda env create --name envname --file=environment.yml```
