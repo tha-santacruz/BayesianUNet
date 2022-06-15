@@ -107,7 +107,7 @@ class PotsdamDataset:
 		# Augment if requested
 		if self.augment:
 			for channel in range(len(self.noise_std)):
-				image[channel] = image[channel] + torch.normal(mean=0, std=self.noise_std[channel], size=(image.size(2),image.size(3)))
+				image[channel] = image[channel] + torch.normal(mean=0, std=self.noise_std[channel], size=(image.size(1),image.size(2)))
 				F.relu(image, inplace=True)
 		document = (image-self.mean_vals_tiles).div(self.std_vals_tiles)
 		## Create label 
