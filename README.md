@@ -1,3 +1,5 @@
+![image_example](https://user-images.githubusercontent.com/65467285/185387844-6766e2ce-43e0-40e9-a380-9eb92a7239b8.png)
+
 # Pytorch Bayesian UNet model for segmentation and uncertainty prediction 
 
 This repository provides the well-known UNet model [[1]](#1) converted to a Bayesian UNet model.
