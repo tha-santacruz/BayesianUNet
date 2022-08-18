@@ -36,9 +36,13 @@ This Bayesian model provides different scores (entropy and mutual information) t
 3.	If a ground truth is provided, "innacurate but certain" maps are produced
 4.	Resulting predictions and maps are saved in the "predictions/" repository
 
+**Update: 
+A similar approach has been developed by Fisher et al [[3]](#3). This work was not inspired by it but further details can be found in this paper.
 
 ## References
 
 <a id="1">[1]</a>  RONNEBERGER, Olaf, FISCHER, Philipp, et BROX, Thomas. U-net: Convolutional networks for biomedical image segmentation. In : International Conference on Medical image computing and computer-assisted intervention. Springer, Cham, 2015. p. 234-241. 
 
 <a id="2">[2]</a> GAL, Yarin et GHAHRAMANI, Zoubin. Dropout as a bayesian approximation: Representing model uncertainty in deep learning. In : international conference on machine learning. PMLR, 2016. p. 1050-1059. [2]
+
+<a id="3">[3]</a> Fisher, T.; Gibson, H.; Liu, Y.; Abdar, M.; Posa, M.; Salimi-Khorshidi, G.; Hassaine, A.; Cai, Y.; Rahimi, K.; Mamouei, M. Uncertainty-Aware Interpretable Deep Learning for Slum Mapping and Monitoring. Remote Sens. 2022, 14, 3072. https://doi.org/10.3390/rs14133072 
