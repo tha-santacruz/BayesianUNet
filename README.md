@@ -38,7 +38,7 @@ This Bayesian model provides different scores (entropy and mutual information) t
 3.	If a ground truth is provided, "innacurate but certain" maps are produced
 4.	Resulting predictions and maps are saved in the "predictions/" repository
 
-**Update: 
+**Update:** 
 A similar approach has been developed by Fisher et al [[3]](#3). This work was not inspired by it but further details can be found in this paper.
 
 ## References
